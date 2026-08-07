@@ -12,15 +12,14 @@ import {
 } from "../data/tracks";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("demo");
+  const [activeTab, setActiveTab] = useState<CategoryKey>("demo");
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
   const [isProtected, setIsProtected] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    setPlayingUrl(null);
-  }, [activeTab]);
-
+  /*
+   * Detect mobile / touch devices.
+   */
   useEffect(() => {
     const widthMql = window.matchMedia("(max-width: 768px)");
     const pointerMql = window.matchMedia("(pointer: coarse)");
@@ -40,6 +39,16 @@ export default function Home() {
     };
   }, []);
 
+  /*
+   * Stop audio whenever the user changes category.
+   */
+  useEffect(() => {
+    setPlayingUrl(null);
+  }, [activeTab]);
+
+  /*
+   * Protection / screenshot detection.
+   */
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -58,6 +67,7 @@ export default function Home() {
         (e.ctrlKey && ["p", "P", "s", "S"].includes(e.key))
       ) {
         e.preventDefault();
+
         setIsProtected(true);
 
         setTimeout(() => {
@@ -74,16 +84,29 @@ export default function Home() {
       "visibilitychange",
       handleVisibilityChange
     );
+
     window.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("contextmenu", handleContextClick);
+
+    document.addEventListener(
+      "contextmenu",
+      handleContextClick
+    );
 
     return () => {
       document.removeEventListener(
         "visibilitychange",
         handleVisibilityChange
       );
-      window.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("contextmenu", handleContextClick);
+
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+
+      document.removeEventListener(
+        "contextmenu",
+        handleContextClick
+      );
     };
   }, []);
 
@@ -92,10 +115,26 @@ export default function Home() {
     label: string;
     icon: string;
   }[] = [
-    { key: "demo", label: "Demo Tracks", icon: "🎵" },
-    { key: "accompaniment", label: "Accompaniment", icon: "🎹" },
-    { key: "parts", label: "Choral Parts", icon: "🎼" },
-    { key: "pdf", label: "Music Sheet", icon: "📄" },
+    {
+      key: "demo",
+      label: "Demo Tracks",
+      icon: "🎵",
+    },
+    {
+      key: "accompaniment",
+      label: "Accompaniment",
+      icon: "🎹",
+    },
+    {
+      key: "parts",
+      label: "Choral Parts",
+      icon: "🎼",
+    },
+    {
+      key: "pdf",
+      label: "Music Sheet",
+      icon: "📄",
+    },
   ];
 
   return (
@@ -103,7 +142,9 @@ export default function Home() {
       <main
         style={{
           ...styles.main,
-          filter: isProtected ? "blur(20px)" : "none",
+          filter: isProtected
+            ? "blur(20px)"
+            : "none",
           transition: "filter 0.2s ease",
         }}
       >
@@ -145,6 +186,14 @@ export default function Home() {
               input:focus,
               input:active {
                 outline: none !important;
+              }
+
+              button {
+                touch-action: manipulation;
+              }
+
+              input[type="range"] {
+                touch-action: pan-x;
               }
 
               .poster-title-top {
@@ -295,6 +344,37 @@ export default function Home() {
                   margin-bottom: 0 !important;
                   padding-bottom: 0 !important;
                 }
+
+                .mobile-player-controls {
+                  gap: 22px !important;
+                }
+
+                .mobile-control-button {
+                  min-width: 56px !important;
+                  min-height: 44px !important;
+                  padding: 8px 10px !important;
+                }
+
+                .mobile-play-button {
+                  width: 52px !important;
+                  height: 52px !important;
+                  min-width: 52px !important;
+                  min-height: 52px !important;
+                }
+
+                .mobile-progress {
+                  height: 8px !important;
+                }
+
+                .mobile-progress::-webkit-slider-thumb {
+                  width: 20px !important;
+                  height: 20px !important;
+                }
+
+                .mobile-progress::-moz-range-thumb {
+                  width: 20px !important;
+                  height: 20px !important;
+                }
               }
             `,
           }}
@@ -322,7 +402,9 @@ export default function Home() {
             style={styles.headerCard}
           >
             <div style={styles.coverWrapper}>
-              <div style={styles.badge}>CANTATA</div>
+              <div style={styles.badge}>
+                CANTATA
+              </div>
 
               <img
                 src="/cover.jpg"
@@ -355,26 +437,32 @@ export default function Home() {
                 className="description-mobile"
                 style={styles.description}
               >
-                Experience the wonder, hope, and joy of the Advent
-                season. Featuring Celtic-inspired melodies and
-                deeply moving choral harmonies, this musical
-                celebration is a passionate call to reflect on the
-                divine mystery and miraculous birth of Christ.
+                Experience the wonder, hope, and joy of the
+                Advent season. Featuring Celtic-inspired
+                melodies and deeply moving choral harmonies,
+                this musical celebration is a passionate call
+                to reflect on the divine mystery and miraculous
+                birth of Christ.
               </p>
             </div>
           </header>
 
           <nav style={styles.tabContainer}>
             {categories.map((cat) => {
-              const isActive = activeTab === cat.key;
+              const isActive =
+                activeTab === cat.key;
 
               return (
                 <button
                   key={cat.key}
-                  onClick={() => setActiveTab(cat.key)}
+                  onClick={() =>
+                    setActiveTab(cat.key)
+                  }
                   style={{
                     ...styles.tabButton,
-                    ...(isActive ? styles.tabActive : {}),
+                    ...(isActive
+                      ? styles.tabActive
+                      : {}),
                   }}
                 >
                   <span>{cat.icon}</span>
@@ -431,12 +519,16 @@ export default function Home() {
                 className="celestial-anim"
                 style={{
                   width: "100%",
-                  height: isMobile ? "70vh" : "100%",
+                  height: isMobile
+                    ? "70vh"
+                    : "100%",
                   display: "flex",
                   flexDirection: "column",
                 }}
               >
-                <div style={styles.iframeWrapper}>
+                <div
+                  style={styles.iframeWrapper}
+                >
                   <iframe
                     src="https://drive.google.com/file/d/1lJ-flEO12RYjixztK1LWbSTRb9UVcjGl/preview?usp=drivesdk"
                     style={styles.iframeStyle}
@@ -445,10 +537,12 @@ export default function Home() {
                   />
                 </div>
 
-                <div style={styles.pdfProtectionNotice}>
+                <div
+                  style={styles.pdfProtectionNotice}
+                >
                   <span>
-                    🔒 Embedded View: Official sheet music score
-                    loaded securely.
+                    🔒 Embedded View: Official sheet music
+                    score loaded securely.
                   </span>
                 </div>
               </div>
@@ -467,7 +561,9 @@ export default function Home() {
       </main>
 
       {isProtected && (
-        <div style={styles.screenshotShieldModal}>
+        <div
+          style={styles.screenshotShieldModal}
+        >
           <div style={styles.shieldBox}>
             <span
               style={{
@@ -496,8 +592,8 @@ export default function Home() {
                 fontSize: "0.88rem",
               }}
             >
-              Screenshots and screen capturing are restricted to
-              protect copyrighted ministry materials.
+              Screenshots and screen capturing are restricted
+              to protect copyrighted ministry materials.
             </p>
           </div>
         </div>
@@ -505,6 +601,10 @@ export default function Home() {
     </>
   );
 }
+
+/* =========================================================
+   TRACK LIST
+========================================================= */
 
 function TrackList({
   tracks,
@@ -535,7 +635,9 @@ function TrackList({
           }}
         >
           <div style={styles.trackHeader}>
-            <div style={styles.trackIcon}>🎧</div>
+            <div style={styles.trackIcon}>
+              🎧
+            </div>
 
             <div style={styles.trackTitle}>
               {track.title}
@@ -553,6 +655,10 @@ function TrackList({
     </div>
   );
 }
+
+/* =========================================================
+   CHORAL PARTS LIST
+========================================================= */
 
 function PartsList({
   tracks,
@@ -587,6 +693,10 @@ function PartsList({
   );
 }
 
+/* =========================================================
+   INDIVIDUAL CHORAL PART
+========================================================= */
+
 function PartRow({
   track,
   index,
@@ -606,6 +716,10 @@ function PartRow({
   const togglePart = (link: PartLink) => {
     if (activePart?.url === link.url) {
       setActivePart(null);
+
+      if (playingUrl === link.url) {
+        setPlayingUrl(null);
+      }
     } else {
       setActivePart(link);
     }
@@ -623,7 +737,9 @@ function PartRow({
       }}
     >
       <div style={styles.trackHeader}>
-        <div style={styles.trackIcon}>🎼</div>
+        <div style={styles.trackIcon}>
+          🎼
+        </div>
 
         <div style={styles.trackTitle}>
           {track.title}
@@ -633,25 +749,29 @@ function PartRow({
       {hasParts ? (
         <>
           <div style={styles.partsGrid}>
-            {track.links.map((link, linkIndex) => {
-              const isActive =
-                activePart?.url === link.url;
+            {track.links.map(
+              (link, linkIndex) => {
+                const isActive =
+                  activePart?.url === link.url;
 
-              return (
-                <button
-                  key={linkIndex}
-                  onClick={() => togglePart(link)}
-                  style={{
-                    ...styles.partButton,
-                    ...(isActive
-                      ? styles.partButtonActive
-                      : {}),
-                  }}
-                >
-                  {link.label}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={linkIndex}
+                    onClick={() =>
+                      togglePart(link)
+                    }
+                    style={{
+                      ...styles.partButton,
+                      ...(isActive
+                        ? styles.partButtonActive
+                        : {}),
+                    }}
+                  >
+                    {link.label}
+                  </button>
+                );
+              }
+            )}
           </div>
 
           {activePart && (
@@ -662,8 +782,12 @@ function PartRow({
                 animationDelay: "0s",
               }}
             >
-              <div style={styles.activePartLabel}>
-                <span style={{ color: "#38bdf8" }}>
+              <div
+                style={styles.activePartLabel}
+              >
+                <span
+                  style={{ color: "#38bdf8" }}
+                >
                   ▶
                 </span>
 
@@ -671,6 +795,7 @@ function PartRow({
               </div>
 
               <AudioPlayer
+                key={activePart.url}
                 url={activePart.url}
                 autoPlay={true}
                 playingUrl={playingUrl}
@@ -696,14 +821,18 @@ function PartRow({
               textAlign: "center",
             }}
           >
-            ⚠️ The audio file is not yet available. It will be
-            updated once released.
+            ⚠️ The audio file is not yet available. It
+            will be updated once released.
           </span>
         </div>
       )}
     </div>
   );
 }
+
+/* =========================================================
+   AUDIO PLAYER
+========================================================= */
 
 function AudioPlayer({
   url,
@@ -718,88 +847,239 @@ function AudioPlayer({
   setPlayingUrl: (url: string | null) => void;
   isMobile: boolean;
 }) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef =
+    useRef<HTMLAudioElement | null>(null);
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [hasError, setHasError] = useState(false);
+  const [isPlaying, setIsPlaying] =
+    useState(false);
+
+  const [currentTime, setCurrentTime] =
+    useState(0);
+
+  const [duration, setDuration] =
+    useState(0);
+
+  const [hasError, setHasError] =
+    useState(false);
+
+  /*
+   * Keep the latest playingUrl accessible to
+   * event handlers without stale closures.
+   */
+  const playingUrlRef =
+    useRef<string | null>(playingUrl);
 
   useEffect(() => {
-    if (
-      playingUrl &&
-      playingUrl !== url &&
-      isPlaying
-    ) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+    playingUrlRef.current = playingUrl;
+  }, [playingUrl]);
 
-      setIsPlaying(false);
-    }
-  }, [playingUrl, url, isPlaying]);
-
+  /*
+   * Main synchronization system.
+   *
+   * If another player becomes active:
+   * pause this player.
+   *
+   * If this player's URL becomes active:
+   * start/resume it.
+   */
   useEffect(() => {
-    setHasError(false);
+    const audio = audioRef.current;
 
-    if (!url) {
-      setHasError(true);
+    if (!audio || hasError) {
       return;
     }
 
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.load();
-
-      if (autoPlay) {
-        audioRef.current
-          .play()
-          .then(() => {
-            setIsPlaying(true);
-            setPlayingUrl(url);
-          })
-          .catch(() => {
-            setIsPlaying(false);
-          });
-      } else {
-        setIsPlaying(false);
+    if (playingUrl !== url) {
+      if (!audio.paused) {
+        audio.pause();
       }
+
+      setIsPlaying(false);
+
+      return;
     }
+
+    /*
+     * This URL is the globally selected player.
+     * Start it only when it is currently paused.
+     */
+    if (audio.paused) {
+      audio
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(() => {
+          /*
+           * Browsers can reject playback because of
+           * autoplay restrictions.
+           */
+          setIsPlaying(false);
+        });
+    }
+  }, [playingUrl, url, hasError]);
+
+  /*
+   * Initialize / reload when the URL changes.
+   *
+   * Important:
+   * We DO NOT reset the audio every time
+   * playingUrl changes. This is what allows
+   * pause -> resume to continue from the
+   * same position.
+   */
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!audio) {
+      return;
+    }
+
+    setHasError(false);
+    setCurrentTime(0);
+    setDuration(0);
+    setIsPlaying(false);
+
+    audio.pause();
+    audio.currentTime = 0;
+
+    /*
+     * Force browser to load the new source.
+     */
+    audio.load();
+
+    /*
+     * For choral part buttons that request
+     * autoPlay, register this URL as the
+     * globally playing URL.
+     */
+    if (autoPlay) {
+      setPlayingUrl(url);
+    }
+
+    return () => {
+      audio.pause();
+    };
   }, [url, autoPlay, setPlayingUrl]);
 
+  /*
+   * Clean up player when component unmounts.
+   */
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  /*
+   * Format seconds into M:SS.
+   */
   const formatTime = (time: number) => {
-    if (isNaN(time)) return "0:00";
+    if (!Number.isFinite(time)) {
+      return "0:00";
+    }
 
     const m = Math.floor(time / 60);
     const s = Math.floor(time % 60);
 
-    return `${m}:${s < 10 ? "0" + s : s}`;
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
-  const togglePlay = () => {
-    if (audioRef.current && !hasError) {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
+  /*
+   * Play / Pause.
+   *
+   * When playing:
+   * - set global playing URL
+   * - this automatically pauses every other player
+   *
+   * When paused:
+   * - set global URL to null
+   * - currentTime is NOT reset
+   * - pressing play again resumes from the
+   *   exact previous position.
+   */
+  const togglePlay = async () => {
+    const audio = audioRef.current;
+
+    if (!audio || hasError) {
+      return;
+    }
+
+    if (!audio.paused) {
+      audio.pause();
+
+      setIsPlaying(false);
+
+      if (playingUrlRef.current === url) {
         setPlayingUrl(null);
-      } else {
-        audioRef.current
-          .play()
-          .then(() => {
-            setIsPlaying(true);
-            setPlayingUrl(url);
-          })
-          .catch(() => {
-            setHasError(true);
-          });
+      }
+
+      return;
+    }
+
+    /*
+     * Set global active player first.
+     * This makes all other AudioPlayer components
+     * stop automatically.
+     */
+    setPlayingUrl(url);
+
+    try {
+      await audio.play();
+
+      setIsPlaying(true);
+    } catch {
+      setIsPlaying(false);
+      setHasError(true);
+
+      if (playingUrlRef.current === url) {
+        setPlayingUrl(null);
       }
     }
   };
 
+  /*
+   * Skip forward/backward.
+   */
   const handleSkip = (seconds: number) => {
-    if (audioRef.current && !hasError) {
-      audioRef.current.currentTime += seconds;
+    const audio = audioRef.current;
+
+    if (!audio || hasError) {
+      return;
     }
+
+    const newTime = Math.max(
+      0,
+      Math.min(
+        audio.duration || Infinity,
+        audio.currentTime + seconds
+      )
+    );
+
+    audio.currentTime = newTime;
+
+    setCurrentTime(newTime);
+  };
+
+  /*
+   * Seek to specific position.
+   */
+  const handleSeek = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const audio = audioRef.current;
+
+    if (!audio || hasError) {
+      return;
+    }
+
+    const newTime = Number(e.target.value);
+
+    audio.currentTime = newTime;
+
+    setCurrentTime(newTime);
   };
 
   if (hasError) {
@@ -818,8 +1098,8 @@ function AudioPlayer({
             textAlign: "center",
           }}
         >
-          ⚠️ The audio file is not yet available. It will be
-          updated once released.
+          ⚠️ The audio file is not yet available. It
+          will be updated once released.
         </span>
       </div>
     );
@@ -830,34 +1110,99 @@ function AudioPlayer({
       <audio
         ref={audioRef}
         src={url}
+        preload="metadata"
         controlsList="nodownload"
         {...({
           disablePictureInPicture: true,
         } as any)}
-        onContextMenu={(e) => e.preventDefault()}
-        onError={() => setHasError(true)}
-        onTimeUpdate={() =>
-          setCurrentTime(
-            audioRef.current?.currentTime || 0
-          )
+        onContextMenu={(e) =>
+          e.preventDefault()
         }
-        onLoadedMetadata={() =>
-          setDuration(
-            audioRef.current?.duration || 0
-          )
-        }
-        onEnded={() => {
+        onError={() => {
+          setHasError(true);
           setIsPlaying(false);
 
-          if (playingUrl === url) {
+          if (playingUrlRef.current === url) {
             setPlayingUrl(null);
+          }
+        }}
+        onLoadedMetadata={() => {
+          const audio = audioRef.current;
+
+          if (!audio) {
+            return;
+          }
+
+          if (
+            Number.isFinite(audio.duration)
+          ) {
+            setDuration(audio.duration);
+          }
+        }}
+        onDurationChange={() => {
+          const audio = audioRef.current;
+
+          if (
+            audio &&
+            Number.isFinite(audio.duration)
+          ) {
+            setDuration(audio.duration);
+          }
+        }}
+        onTimeUpdate={() => {
+          const audio = audioRef.current;
+
+          if (audio) {
+            setCurrentTime(
+              audio.currentTime
+            );
+          }
+        }}
+        onPlay={() => {
+          setIsPlaying(true);
+
+          /*
+           * Synchronize global state if playback
+           * starts from a browser interaction.
+           */
+          if (
+            playingUrlRef.current !== url
+          ) {
+            setPlayingUrl(url);
+          }
+        }}
+        onPause={() => {
+          setIsPlaying(false);
+        }}
+        onEnded={() => {
+          setIsPlaying(false);
+          setCurrentTime(0);
+
+          if (
+            playingUrlRef.current === url
+          ) {
+            setPlayingUrl(null);
+          }
+
+          /*
+           * Return to the beginning when finished,
+           * allowing the user to replay normally.
+           */
+          if (audioRef.current) {
+            audioRef.current.currentTime = 0;
           }
         }}
         style={{ display: "none" }}
       />
 
       <div style={styles.customPlayer}>
-        <div style={styles.progressContainer}>
+        {/* =================================================
+            PROGRESS / SEEK BAR
+        ================================================== */}
+
+        <div
+          style={styles.progressContainer}
+        >
           <span style={styles.timeText}>
             {formatTime(currentTime)}
           </span>
@@ -866,18 +1211,24 @@ function AudioPlayer({
             type="range"
             min="0"
             max={duration || 100}
-            value={currentTime}
-            onChange={(e) => {
-              const newTime = Number(e.target.value);
-
-              setCurrentTime(newTime);
-
-              if (audioRef.current) {
-                audioRef.current.currentTime =
-                  newTime;
-              }
+            step="0.01"
+            value={Math.min(
+              currentTime,
+              duration || 100
+            )}
+            onChange={handleSeek}
+            className={
+              isMobile
+                ? "mobile-progress"
+                : undefined
+            }
+            style={{
+              ...styles.progressBar,
+              ...(isMobile
+                ? styles.mobileProgressBar
+                : {}),
             }}
-            style={styles.progressBar}
+            aria-label="Audio progress"
           />
 
           <span style={styles.timeText}>
@@ -885,32 +1236,102 @@ function AudioPlayer({
           </span>
         </div>
 
-        <div style={styles.playerControls}>
+        {/* =================================================
+            PLAYER CONTROLS
+        ================================================== */}
+
+        <div
+          className={
+            isMobile
+              ? "mobile-player-controls"
+              : undefined
+          }
+          style={{
+            ...styles.playerControls,
+            ...(isMobile
+              ? styles.mobilePlayerControls
+              : {}),
+          }}
+        >
+          {/* BACK 5 SECONDS */}
           <button
-            onClick={() => handleSkip(-5)}
-            style={styles.controlBtn}
+            onClick={() =>
+              handleSkip(-5)
+            }
+            className={
+              isMobile
+                ? "mobile-control-button"
+                : undefined
+            }
+            style={{
+              ...styles.controlBtn,
+              ...(isMobile
+                ? styles.mobileControlBtn
+                : {}),
+            }}
+            aria-label="Rewind 5 seconds"
           >
             ↺ 5s
           </button>
 
+          {/* PLAY / PAUSE */}
           <button
             onClick={togglePlay}
-            style={styles.playBtn}
-            aria-label={isPlaying ? "Pause" : "Play"}
+            className={
+              isMobile
+                ? "mobile-play-button"
+                : undefined
+            }
+            style={{
+              ...styles.playBtn,
+              ...(isMobile
+                ? styles.mobilePlayBtn
+                : {}),
+            }}
+            aria-label={
+              isPlaying
+                ? "Pause"
+                : "Play"
+            }
           >
             {isPlaying ? (
               <span style={styles.pauseIcon}>
-                <span style={styles.pauseIconBar} />
-                <span style={styles.pauseIconBar} />
+                <span
+                  style={
+                    styles.pauseIconBar
+                  }
+                />
+
+                <span
+                  style={
+                    styles.pauseIconBar
+                  }
+                />
               </span>
             ) : (
-              <span style={styles.playIcon} />
+              <span
+                style={styles.playIcon}
+              />
             )}
           </button>
 
+          {/* FORWARD 5 SECONDS */}
           <button
-            onClick={() => handleSkip(5)}
-            style={styles.controlBtn}
+            onClick={() =>
+              handleSkip(5)
+            }
+            className={
+              isMobile
+                ? "mobile-control-button"
+                : undefined
+            }
+            style={{
+              ...styles.controlBtn,
+              ...(isMobile
+                ? styles.mobileControlBtn
+                : {}),
+            }}
+            aria-label="Forward 5 seconds"
           >
             ↻ 5s
           </button>
@@ -920,7 +1341,14 @@ function AudioPlayer({
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
+/* =========================================================
+   STYLES
+========================================================= */
+
+const styles: Record<
+  string,
+  React.CSSProperties
+> = {
   main: {
     height: "100dvh",
     display: "flex",
@@ -929,7 +1357,8 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundImage:
       "radial-gradient(circle at 50% 15%, #0f172a 0%, #030712 75%)",
     color: "#f8fafc",
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontFamily:
+      "'Plus Jakarta Sans', sans-serif",
     position: "fixed",
     top: 0,
     left: 0,
@@ -996,12 +1425,14 @@ const styles: Record<string, React.CSSProperties> = {
     gap: "clamp(12px, 3vw, 36px)",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(15, 23, 42, 0.75)",
+    backgroundColor:
+      "rgba(15, 23, 42, 0.75)",
     backdropFilter: "blur(20px)",
     WebkitBackdropFilter: "blur(20px)",
     borderWidth: "1px",
     borderStyle: "solid",
-    borderColor: "rgba(56, 189, 248, 0.2)",
+    borderColor:
+      "rgba(56, 189, 248, 0.2)",
     borderRadius: "20px",
     padding:
       "clamp(10px, 2vh, 20px) clamp(14px, 4vw, 28px)",
@@ -1022,7 +1453,8 @@ const styles: Record<string, React.CSSProperties> = {
     position: "absolute",
     top: "6px",
     left: "6px",
-    backgroundColor: "rgba(99, 102, 241, 0.9)",
+    backgroundColor:
+      "rgba(99, 102, 241, 0.9)",
     backdropFilter: "blur(6px)",
     color: "#e0e7ff",
     fontSize: "0.55rem",
@@ -1056,7 +1488,8 @@ const styles: Record<string, React.CSSProperties> = {
 
   subtitle: {
     color: "#38bdf8",
-    fontSize: "clamp(0.65rem, 1.2vw, 0.75rem)",
+    fontSize:
+      "clamp(0.65rem, 1.2vw, 0.75rem)",
     fontWeight: 600,
     textTransform: "uppercase",
     letterSpacing: "0.15em",
@@ -1065,7 +1498,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   title: {
-    fontSize: "clamp(0.95rem, 4.6vw, 2.2rem)",
+    fontSize:
+      "clamp(0.95rem, 4.6vw, 2.2rem)",
     margin: "6px 0 4px 0",
     fontWeight: 700,
     color: "#ffffff",
@@ -1081,7 +1515,8 @@ const styles: Record<string, React.CSSProperties> = {
   description: {
     margin: 0,
     color: "#94a3b8",
-    fontSize: "clamp(0.7rem, 1.4vw, 0.9rem)",
+    fontSize:
+      "clamp(0.7rem, 1.4vw, 0.9rem)",
     lineHeight: 1.35,
     width: "100%",
     textAlign: "justify",
@@ -1102,10 +1537,12 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: "8px",
     padding: "7px 14px",
-    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    backgroundColor:
+      "rgba(15, 23, 42, 0.6)",
     borderWidth: "1px",
     borderStyle: "solid",
-    borderColor: "rgba(255, 255, 255, 0.08)",
+    borderColor:
+      "rgba(255, 255, 255, 0.08)",
     borderRadius: "30px",
     color: "#94a3b8",
     fontSize: "0.85rem",
@@ -1131,12 +1568,14 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
     overflowY: "auto",
     WebkitOverflowScrolling: "touch",
-    backgroundColor: "rgba(15, 23, 42, 0.45)",
+    backgroundColor:
+      "rgba(15, 23, 42, 0.45)",
     backdropFilter: "blur(16px)",
     WebkitBackdropFilter: "blur(16px)",
     borderWidth: "1px",
     borderStyle: "solid",
-    borderColor: "rgba(56, 189, 248, 0.15)",
+    borderColor:
+      "rgba(56, 189, 248, 0.15)",
     borderRadius: "20px",
     padding: "16px 24px",
     boxSizing: "border-box",
@@ -1271,6 +1710,7 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
     boxSizing: "border-box",
     cursor: "pointer",
+    minHeight: "38px",
   },
 
   partButtonActive: {
@@ -1316,12 +1756,47 @@ const styles: Record<string, React.CSSProperties> = {
       "1px solid rgba(255, 255, 255, 0.04)",
   },
 
+  progressContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "10px",
+    width: "100%",
+    maxWidth: "480px",
+  },
+
+  progressBar: {
+    flex: 1,
+    minWidth: "70px",
+    cursor: "pointer",
+    accentColor: "#38bdf8",
+    height: "4px",
+  },
+
+  mobileProgressBar: {
+    height: "8px",
+  },
+
+  timeText: {
+    fontSize: "0.78rem",
+    color: "#94a3b8",
+    minWidth: "32px",
+    textAlign: "center",
+    fontVariantNumeric:
+      "tabular-nums",
+  },
+
   playerControls: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     gap: "16px",
     height: "48px",
+  },
+
+  mobilePlayerControls: {
+    gap: "22px",
+    height: "56px",
   },
 
   controlBtn: {
@@ -1334,7 +1809,14 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    transition: "color 0.2s ease",
+    transition:
+      "color 0.2s ease",
+  },
+
+  mobileControlBtn: {
+    minWidth: "56px",
+    minHeight: "44px",
+    padding: "8px 10px",
   },
 
   playBtn: {
@@ -1345,7 +1827,8 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "50%",
     backgroundColor: "transparent",
     color: "#ffffff",
-    border: "1px solid rgba(56, 189, 248, 0.65)",
+    border:
+      "1px solid rgba(56, 189, 248, 0.65)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -1354,19 +1837,30 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     boxShadow:
       "0 0 12px rgba(56, 189, 248, 0.25)",
-    transition: "all 0.15s ease",
+    transition:
+      "all 0.15s ease",
     WebkitAppearance: "none",
     appearance: "none",
     outline: "none",
     flexShrink: 0,
   },
 
+  mobilePlayBtn: {
+    width: "52px",
+    height: "52px",
+    minWidth: "52px",
+    minHeight: "52px",
+  },
+
   playIcon: {
     width: 0,
     height: 0,
-    borderTop: "7px solid transparent",
-    borderBottom: "7px solid transparent",
-    borderLeft: "11px solid #ffffff",
+    borderTop:
+      "7px solid transparent",
+    borderBottom:
+      "7px solid transparent",
+    borderLeft:
+      "11px solid #ffffff",
     display: "block",
     marginLeft: "3px",
   },
@@ -1386,31 +1880,6 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "#ffffff",
     borderRadius: "1px",
     display: "block",
-  },
-
-  progressContainer: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "10px",
-    width: "100%",
-    maxWidth: "480px",
-  },
-
-  progressBar: {
-    flex: 1,
-    minWidth: "70px",
-    cursor: "pointer",
-    accentColor: "#38bdf8",
-    height: "4px",
-  },
-
-  timeText: {
-    fontSize: "0.78rem",
-    color: "#94a3b8",
-    minWidth: "32px",
-    textAlign: "center",
-    fontVariantNumeric: "tabular-nums",
   },
 
   emptyState: {
@@ -1445,7 +1914,8 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor:
       "rgba(3, 7, 18, 0.95)",
     backdropFilter: "blur(25px)",
-    WebkitBackdropFilter: "blur(25px)",
+    WebkitBackdropFilter:
+      "blur(25px)",
     zIndex: 99999,
     display: "flex",
     alignItems: "center",
