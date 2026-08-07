@@ -1,4 +1,3 @@
-````markdown
 # Invitation to a Miracle
 
 An interactive digital invitation and music resource website for **"Invitation to a Miracle"**, a Christmas cantata by **Joseph M. Martin**.
