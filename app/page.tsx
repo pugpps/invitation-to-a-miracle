@@ -18,8 +18,7 @@ import {
 } from "../data/tracks";
 
 export default function Home() {
-  const [activeTab, setActiveTab] =
-    useState<CategoryKey>("demo");
+  const [activeTab, setActiveTab] = useState("demo");
 
   const [playingUrl, setPlayingUrl] =
     useState<string | null>(null);
@@ -33,10 +32,6 @@ export default function Home() {
   /*
    * IMPORTANT:
    * Keep this function stable between renders.
-   *
-   * Previously, setPlayingUrl was passed directly to every
-   * AudioPlayer. Every Home render created a new function,
-   * which could cause the AudioPlayer effects to run again.
    */
   const handleSetPlayingUrl = useCallback(
     (url: string | null) => {
@@ -322,11 +317,16 @@ export default function Home() {
                 animation: beamGlow 6s ease-in-out infinite;
               }
 
+              /*
+               * ============================================
+               * MOBILE
+               * ============================================
+               */
               @media screen and (max-width: 768px) {
                 html,
                 body {
                   height: auto !important;
-                  min-height: 0 !important;
+                  min-height: 100% !important;
                   overflow-x: hidden !important;
                   overflow-y: auto !important;
                   -webkit-overflow-scrolling: touch;
@@ -339,10 +339,10 @@ export default function Home() {
                   right: auto !important;
                   bottom: auto !important;
                   height: auto !important;
-                  min-height: 0 !important;
+                  min-height: 100dvh !important;
                   max-height: none !important;
                   overflow: visible !important;
-                  padding: 8px 10px !important;
+                  padding: 8px 10px 16px !important;
                 }
 
                 .mobile-container-override {
@@ -351,6 +351,7 @@ export default function Home() {
                   max-height: none !important;
                   overflow: visible !important;
                   flex: none !important;
+                  padding-bottom: 0 !important;
                 }
 
                 .mobile-content-override {
@@ -398,9 +399,77 @@ export default function Home() {
                   overflow: visible !important;
                 }
 
-                .footer-mobile {
+                /*
+                 * ==========================================
+                 * MOBILE PDF VIEWER
+                 * ==========================================
+                 */
+
+                .pdf-viewer-mobile {
+                  width: 100% !important;
+                  height: auto !important;
+                  min-height: 0 !important;
+                  max-height: none !important;
+                  display: flex !important;
+                  flex-direction: column !important;
+                  overflow: visible !important;
+                }
+
+                .pdf-iframe-wrapper-mobile {
+                  width: 100% !important;
+                  height: 65vh !important;
+                  min-height: 420px !important;
+                  max-height: 680px !important;
+                  flex: none !important;
+                  position: relative !important;
+                  overflow: hidden !important;
+                  border-radius: 14px !important;
+                }
+
+                .pdf-iframe-mobile {
+                  width: 100% !important;
+                  height: 100% !important;
+                  min-height: 0 !important;
+                  display: block !important;
+                  border: none !important;
+                }
+
+                .pdf-notice-mobile {
+                  flex: none !important;
+                  width: 100% !important;
+                  margin-top: 10px !important;
                   margin-bottom: 0 !important;
-                  padding-bottom: 0 !important;
+                  padding: 0 6px !important;
+                  text-align: center !important;
+                  line-height: 1.35 !important;
+                  font-size: 0.72rem !important;
+                  position: relative !important;
+                  z-index: 2 !important;
+                }
+
+                /*
+                 * ==========================================
+                 * FOOTER
+                 * ==========================================
+                 */
+
+                .footer-mobile {
+                  position: relative !important;
+                  flex: none !important;
+                  width: 100% !important;
+                  margin-top: 18px !important;
+                  padding-top: 10px !important;
+                  padding-bottom: 18px !important;
+                  min-height: 42px !important;
+                  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+                  z-index: 5 !important;
+                  clear: both !important;
+                }
+
+                .footer-mobile p {
+                  position: relative !important;
+                  margin: 0 !important;
+                  line-height: 1.4 !important;
                 }
 
                 .mobile-player-controls {
@@ -435,6 +504,25 @@ export default function Home() {
                   height: 20px !important;
                 }
               }
+
+              /*
+               * Extra-small phones
+               */
+              @media screen and (max-width: 390px) {
+                .pdf-iframe-wrapper-mobile {
+                  height: 60vh !important;
+                  min-height: 380px !important;
+                }
+
+                .pdf-notice-mobile {
+                  font-size: 0.68rem !important;
+                }
+
+                .footer-mobile {
+                  margin-top: 16px !important;
+                  padding-bottom: 20px !important;
+                }
+              }
             `,
           }}
         />
@@ -456,6 +544,10 @@ export default function Home() {
               : {}),
           }}
         >
+          {/* =========================================
+              HEADER
+          ========================================== */}
+
           <header
             className="header-card-mobile"
             style={styles.headerCard}
@@ -496,16 +588,20 @@ export default function Home() {
                 className="description-mobile"
                 style={styles.description}
               >
-                Experience the wonder, hope, and joy
-                of the Advent season. Featuring
+                Experience the wonder, hope, and
+                joy of the Advent season. Featuring
                 Celtic-inspired melodies and deeply
-                moving choral harmonies, this musical
-                celebration is a passionate call to
-                reflect on the divine mystery and
-                miraculous birth of Christ.
+                moving choral harmonies, this
+                musical celebration is a passionate
+                call to reflect on the divine mystery
+                and miraculous birth of Christ.
               </p>
             </div>
           </header>
+
+          {/* =========================================
+              TABS
+          ========================================== */}
 
           <nav style={styles.tabContainer}>
             {categories.map((cat) => {
@@ -533,6 +629,10 @@ export default function Home() {
             })}
           </nav>
 
+          {/* =========================================
+              CONTENT
+          ========================================== */}
+
           <section
             className="celestial-scroll mobile-content-override"
             style={{
@@ -548,6 +648,8 @@ export default function Home() {
                 : {}),
             }}
           >
+            {/* DEMO */}
+
             {activeTab === "demo" && (
               <TrackList
                 tracks={demoTracks}
@@ -558,6 +660,8 @@ export default function Home() {
                 isMobile={isMobile}
               />
             )}
+
+            {/* ACCOMPANIMENT */}
 
             {activeTab === "accompaniment" && (
               <TrackList
@@ -570,6 +674,8 @@ export default function Home() {
               />
             )}
 
+            {/* PARTS */}
+
             {activeTab === "parts" && (
               <PartsList
                 tracks={partsTracks}
@@ -581,23 +687,50 @@ export default function Home() {
               />
             )}
 
+            {/* PDF */}
+
             {activeTab === "pdf" && (
               <div
-                className="celestial-anim"
+                className={`celestial-anim ${
+                  isMobile
+                    ? "pdf-viewer-mobile"
+                    : ""
+                }`}
                 style={{
                   width: "100%",
                   height: isMobile
-                    ? "70vh"
+                    ? "auto"
                     : "100%",
+                  minHeight: 0,
                   display: "flex",
                   flexDirection: "column",
                 }}
               >
                 <div
-                  style={styles.iframeWrapper}
+                  className={
+                    isMobile
+                      ? "pdf-iframe-wrapper-mobile"
+                      : ""
+                  }
+                  style={{
+                    ...styles.iframeWrapper,
+                    ...(isMobile
+                      ? {
+                          flex: "none",
+                          height: "65vh",
+                          minHeight: "420px",
+                          maxHeight: "680px",
+                        }
+                      : {}),
+                  }}
                 >
                   <iframe
                     src="https://drive.google.com/file/d/1lJ-flEO12RYjixztK1LWbSTRb9UVcjGl/preview?usp=drivesdk"
+                    className={
+                      isMobile
+                        ? "pdf-iframe-mobile"
+                        : ""
+                    }
                     style={styles.iframeStyle}
                     title="Invitation To A Miracle Sheet Music"
                     allow="autoplay"
@@ -605,6 +738,11 @@ export default function Home() {
                 </div>
 
                 <div
+                  className={
+                    isMobile
+                      ? "pdf-notice-mobile"
+                      : ""
+                  }
                   style={
                     styles.pdfProtectionNotice
                   }
@@ -618,6 +756,10 @@ export default function Home() {
             )}
           </section>
 
+          {/* =========================================
+              FOOTER
+          ========================================== */}
+
           <footer
             className="footer-mobile"
             style={styles.footer}
@@ -628,6 +770,10 @@ export default function Home() {
           </footer>
         </div>
       </main>
+
+      {/* =========================================
+          SCREENSHOT PROTECTION
+      ========================================== */}
 
       {isProtected && (
         <div
@@ -686,7 +832,9 @@ function TrackList({
 }: {
   tracks: Track[];
   playingUrl: string | null;
-  setPlayingUrl: (url: string | null) => void;
+  setPlayingUrl: (
+    url: string | null
+  ) => void;
   isMobile: boolean;
 }) {
   return (
@@ -740,7 +888,9 @@ function PartsList({
 }: {
   tracks: PartTrack[];
   playingUrl: string | null;
-  setPlayingUrl: (url: string | null) => void;
+  setPlayingUrl: (
+    url: string | null
+  ) => void;
   isMobile: boolean;
 }) {
   return (
@@ -779,7 +929,9 @@ function PartRow({
   track: PartTrack;
   index: number;
   playingUrl: string | null;
-  setPlayingUrl: (url: string | null) => void;
+  setPlayingUrl: (
+    url: string | null
+  ) => void;
   isMobile: boolean;
 }) {
   const [activePart, setActivePart] =
@@ -934,7 +1086,9 @@ function AudioPlayer({
   url: string;
   autoPlay?: boolean;
   playingUrl: string | null;
-  setPlayingUrl: (url: string | null) => void;
+  setPlayingUrl: (
+    url: string | null
+  ) => void;
   isMobile: boolean;
 }) {
   const audioRef =
@@ -973,17 +1127,7 @@ function AudioPlayer({
   }, [playingUrl]);
 
   /*
-   * =====================================================
    * SOURCE INITIALIZATION
-   *
-   * This effect ONLY runs when the URL changes.
-   *
-   * VERY IMPORTANT:
-   * Do not put playingUrl or setPlayingUrl here.
-   *
-   * The old code could cause audio.load() to happen
-   * during unrelated React renders.
-   * =====================================================
    */
   useEffect(() => {
     const audio =
@@ -1000,9 +1144,6 @@ function AudioPlayer({
 
     audio.pause();
 
-    /*
-     * Only load when the actual source changes.
-     */
     audio.load();
 
     if (autoPlay) {
@@ -1027,13 +1168,7 @@ function AudioPlayer({
   ]);
 
   /*
-   * =====================================================
    * GLOBAL PLAYBACK SYNCHRONIZATION
-   *
-   * This effect does NOT load the audio.
-   *
-   * It only pauses/plays the existing audio element.
-   * =====================================================
    */
   useEffect(() => {
     const audio =
@@ -1051,11 +1186,6 @@ function AudioPlayer({
       return;
     }
 
-    /*
-     * The selected player should play.
-     *
-     * Do not call load().
-     */
     if (audio.paused) {
       audio
         .play()
@@ -1073,9 +1203,7 @@ function AudioPlayer({
   ]);
 
   /*
-   * =====================================================
    * FORMAT TIME
-   * =====================================================
    */
   const formatTime = (
     time: number
@@ -1096,9 +1224,7 @@ function AudioPlayer({
   };
 
   /*
-   * =====================================================
    * PLAY / PAUSE
-   * =====================================================
    */
   const togglePlay = async () => {
     const audio =
@@ -1123,9 +1249,6 @@ function AudioPlayer({
       return;
     }
 
-    /*
-     * Select this player globally.
-     */
     setPlayingUrl(url);
 
     try {
@@ -1138,9 +1261,7 @@ function AudioPlayer({
   };
 
   /*
-   * =====================================================
    * SKIP
-   * =====================================================
    */
   const handleSkip = (
     seconds: number
@@ -1177,13 +1298,7 @@ function AudioPlayer({
   };
 
   /*
-   * =====================================================
    * MOBILE-SMOOTH SEEKING
-   *
-   * Instead of forcing React to render for every single
-   * slider event, update the audio immediately and
-   * visually update React at most once per animation frame.
-   * =====================================================
    */
   const handleSeek = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -1204,15 +1319,9 @@ function AudioPlayer({
       return;
     }
 
-    /*
-     * Change the REAL audio position immediately.
-     */
     audio.currentTime =
       newTime;
 
-    /*
-     * Cancel previous visual update.
-     */
     if (
       seekRafRef.current !== null
     ) {
@@ -1221,10 +1330,6 @@ function AudioPlayer({
       );
     }
 
-    /*
-     * Update React state only once
-     * per browser animation frame.
-     */
     seekRafRef.current =
       requestAnimationFrame(() => {
         setCurrentTime(
@@ -1241,8 +1346,7 @@ function AudioPlayer({
       <div
         style={{
           ...styles.customPlayer,
-          justifyContent:
-            "center",
+          justifyContent: "center",
         }}
       >
         <span
@@ -1320,10 +1424,6 @@ function AudioPlayer({
             audioRef.current;
 
           if (audio) {
-            /*
-             * Don't update state while user is
-             * actively dragging the slider.
-             */
             setCurrentTime(
               audio.currentTime
             );
@@ -1364,9 +1464,7 @@ function AudioPlayer({
       />
 
       <div style={styles.customPlayer}>
-        {/* =================================================
-            PROGRESS / SEEK BAR
-        ================================================== */}
+        {/* PROGRESS / SEEK BAR */}
 
         <div
           style={
@@ -1396,11 +1494,6 @@ function AudioPlayer({
                 ? duration
                 : 100
             )}
-            /*
-             * onChange works well on most browsers,
-             * while the actual audio position is changed
-             * immediately inside handleSeek.
-             */
             onChange={handleSeek}
             className={
               isMobile
@@ -1425,9 +1518,7 @@ function AudioPlayer({
           </span>
         </div>
 
-        {/* =================================================
-            PLAYER CONTROLS
-        ================================================== */}
+        {/* PLAYER CONTROLS */}
 
         <div
           className={
@@ -1784,13 +1875,14 @@ const styles: Record<
     boxSizing: "border-box",
     boxShadow:
       "inset 0 1px 1px rgba(255, 255, 255, 0.05)",
+    minHeight: 0,
   },
 
   iframeWrapper: {
     position: "relative",
     width: "100%",
     flex: 1,
-    minHeight: "100%",
+    minHeight: 0,
     borderRadius: "14px",
     overflow: "hidden",
     border:
@@ -1801,16 +1893,19 @@ const styles: Record<
   iframeStyle: {
     width: "100%",
     height: "100%",
-    minHeight: "100%",
+    minHeight: 0,
     border: "none",
+    display: "block",
   },
 
   pdfProtectionNotice: {
+    flexShrink: 0,
     marginTop: "8px",
     textAlign: "center",
     color: "#94a3b8",
     fontSize: "0.8rem",
     letterSpacing: "0.03em",
+    lineHeight: 1.35,
   },
 
   trackRow: {
@@ -1837,6 +1932,7 @@ const styles: Record<
     gap: "14px",
     width: "100%",
     flex: 1,
+    minWidth: 0,
   },
 
   trackIcon: {
@@ -1860,6 +1956,7 @@ const styles: Record<
     color: "#f8fafc",
     lineHeight: 1.4,
     flex: 1,
+    minWidth: 0,
   },
 
   partRow: {
@@ -2082,6 +2179,9 @@ const styles: Record<
     display: "block",
   },
 
+  /*
+   * FOOTER
+   */
   footer: {
     flexShrink: 0,
     marginTop: "8px",
@@ -2090,6 +2190,7 @@ const styles: Record<
     borderTop:
       "1px solid rgba(255, 255, 255, 0.05)",
     textAlign: "center",
+    position: "relative",
   },
 
   footerText: {
@@ -2098,8 +2199,12 @@ const styles: Record<
     margin: 0,
     fontWeight: 400,
     letterSpacing: "0.05em",
+    lineHeight: 1.4,
   },
 
+  /*
+   * SCREENSHOT PROTECTION
+   */
   screenshotShieldModal: {
     position: "fixed",
     top: 0,
