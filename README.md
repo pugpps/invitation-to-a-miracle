@@ -1,65 +1,167 @@
-# Invitation To A Miracle
+````markdown
+# Invitation to a Miracle
 
-A responsive digital invitation and music resource website for **Invitation To A Miracle**, a Christmas/Advent cantata by **Joseph M. Martin**.
+An interactive digital invitation and music resource website for **"Invitation to a Miracle"**, a Christmas cantata by **Joseph M. Martin**.
 
-The website provides a centralized and mobile-friendly way for invited users to access the cantata's demo tracks, accompaniment tracks, choral parts, and music sheet.
+The website provides a centralized and interactive way for members, singers, musicians, and ministry participants to access the available musical resources for the cantata.
+
+## Overview
+
+**Invitation to a Miracle** is an Advent musical celebration featuring Celtic-inspired melodies and deeply moving choral harmonies. The website was created to provide convenient access to the musical materials associated with the cantata.
+
+The website includes:
+
+- Demo tracks
+- Accompaniment tracks
+- Individual choral parts
+- Music sheet viewing
+- Custom audio players
+- Responsive desktop and mobile layouts
+- Content protection features
+- Interactive navigation
+- Audio playback controls
 
 ## Features
 
-- 🎵 **Demo Tracks**
-  - Listen to available demo recordings.
-  - Custom audio player with play/pause controls.
-  - 5-second forward and backward controls.
-  - Audio progress bar.
-  - Current playback time and total duration.
-  - Automatically pauses the previously playing track.
+### Demo Tracks
 
-- 🎹 **Accompaniment**
-  - Access available accompaniment recordings.
-  - Uses the same custom audio player interface.
+The Demo Tracks section contains the available demonstration recordings for the cantata.
 
-- 🎼 **Choral Parts**
-  - Access individual vocal parts when available.
-  - Part selection for different recordings.
-  - Automatically starts the selected part.
-  - Displays a notice when a part is not yet available.
+Users can:
 
-- 📄 **Music Sheet**
-  - Embedded Google Drive music sheet viewer.
-  - Allows the official music score to be viewed directly from the website.
+- Play and pause tracks
+- View the current playback time
+- View the total duration
+- Seek through the recording
+- Skip backward by 5 seconds
+- Skip forward by 5 seconds
+- Automatically stop the previous track when another track starts playing
 
-- 📱 **Responsive Design**
-  - Optimized for desktop and mobile devices.
-  - Mobile layout automatically adjusts based on screen size and touch capability.
-  - Scrollable content on mobile devices.
-  - Desktop interface uses a contained full-screen layout.
+### Accompaniment
 
-- 🌌 **Celestial / Advent Theme**
-  - Dark blue visual design.
-  - Subtle celestial lighting effects.
-  - Glassmorphism-inspired cards.
-  - Animated content transitions.
-  - Typography using Cinzel, Great Vibes, and Plus Jakarta Sans.
+The Accompaniment section provides access to available accompaniment recordings.
 
-- 🔒 **Content Protection**
-  - Disables right-click/context menus.
-  - Prevents common browser shortcuts associated with saving, printing, and developer tools.
-  - Detects Print Screen keyboard events where supported.
-  - Displays a protected-content overlay when screen capture activity or page visibility changes is detected.
-  - Disables text selection and mobile long-press callouts.
+The same custom audio player is used for convenient playback and navigation.
 
-> **Note:** Browser-based screenshot protection cannot completely prevent screenshots or screen recording. Operating systems, browsers, and mobile devices can capture content outside the control of a webpage. The implemented protection is intended to discourage casual copying and provide an additional layer of content protection.
+### Choral Parts
 
-## Tech Stack
+The Choral Parts section provides individual vocal or sectional recordings when available.
+
+Each musical selection can contain multiple available parts. Users can select a specific part to begin playback.
+
+If a part is not yet available, the website displays a notice indicating that the recording will be updated once released.
+
+### Music Sheet
+
+The Music Sheet section provides an embedded viewer for the official sheet music.
+
+The sheet music is displayed through an embedded Google Drive viewer to allow users to view the material directly within the website.
+
+## Custom Audio Player
+
+The website uses a custom-built audio player instead of the browser's default audio controls.
+
+The player includes:
+
+- Play button
+- Pause button
+- Progress slider
+- Current playback time
+- Total duration
+- 5-second rewind
+- 5-second forward
+- Automatic playback state management
+- Error handling for unavailable audio files
+
+The player is designed with a transparent and minimal interface to match the overall visual design of the website.
+
+## Responsive Design
+
+The website is designed to work across different screen sizes.
+
+### Desktop
+
+The desktop layout uses:
+
+- A centered content container
+- Glass-style cards
+- Scrollable content sections
+- Horizontal navigation controls
+- Responsive audio controls
+
+### Mobile
+
+The mobile layout automatically adjusts to smaller screens.
+
+It provides:
+
+- Vertical scrolling
+- Compact header
+- Mobile-friendly navigation
+- Responsive track cards
+- Responsive audio controls
+- Reduced spacing where appropriate
+- Touch-friendly controls
+
+The website detects mobile devices using both viewport width and pointer capabilities.
+
+## Content Protection
+
+The website includes several client-side content protection measures intended to discourage unauthorized copying of ministry materials.
+
+These include:
+
+- Disabled right-click context menus
+- Disabled text selection
+- Disabled touch callouts
+- Keyboard shortcut interception
+- PrintScreen key detection
+- Screenshot-related shortcut detection
+- Print shortcut detection
+- Save shortcut detection
+- Visibility-change detection
+- Temporary protected-content overlay
+
+When a protected action is detected, the website can temporarily blur the main content and display a protection message.
+
+### Important Note
+
+These features are intended as a deterrent and user-interface protection mechanism.
+
+A website running in a normal browser cannot completely prevent screenshots or screen recording performed by the operating system, browser, external applications, or another device.
+
+## Design
+
+The website uses a dark celestial visual theme inspired by the Advent and Christmas setting of the cantata.
+
+The design includes:
+
+- Dark navy background
+- Blue and cyan accent colors
+- Soft radial lighting effects
+- Glassmorphism-style cards
+- Rounded containers
+- Subtle shadows
+- Animated content transitions
+- Celestial glow effects
+
+The website uses the following fonts:
+
+- Cinzel
+- Great Vibes
+- Plus Jakarta Sans
+
+## Technologies
+
+The project is built using modern web technologies.
 
 - Next.js
 - React
 - TypeScript
-- CSS-in-JS / React inline styles
-- Google Fonts
-- Google Drive Embedded Viewer
+- CSS
+- HTML5 Audio
+- Google Drive embedded viewer
 - Vercel
-- GitHub
 
 ## Project Structure
 
@@ -75,216 +177,133 @@ The website provides a centralized and mobile-friendly way for invited users to 
 │   └── ...
 ├── package.json
 ├── tsconfig.json
-├── next.config.*
 └── README.md
+````
 
-Track Data
+## Track Data
 
-The available tracks are maintained in:
+Musical resources are managed through the project's track data file.
 
-data/tracks.ts
+Track information can include:
 
-The project separates the audio resources into:
+* Track ID
+* Track title
+* Audio URL
+* Part links
+* Part labels
 
-demoTracks
-accompanimentTracks
-partsTracks
+This structure makes it easier to add, remove, or update recordings without modifying the main user interface.
 
-Each track contains the information required by the custom audio player, such as its title, identifier, and audio URL.
+## Audio Playback Behavior
 
-Custom Audio Player
+Only one audio track is intended to play at a time.
 
-The website uses a custom audio interface instead of displaying the browser's default audio controls.
+When a new track starts:
 
-The player provides:
+1. The selected track begins playback.
+2. The currently playing track is identified.
+3. Other audio players detect the change.
+4. The previous track is paused.
+5. The previous player updates its state.
+6. The newly selected track becomes the active player.
 
-Current Time
-     │
-     ▼
-[ Progress Bar ]
-     │
-     ▼
-↺ 5s    ▶ / ⏸    ↻ 5s
+This prevents multiple recordings from playing simultaneously.
 
-The player includes:
+## Error Handling
 
-Play
-Pause
-Seek forward 5 seconds
-Seek backward 5 seconds
-Progress seeking
-Duration display
-Automatic playback management
-Error handling for unavailable audio
+If an audio file cannot be loaded or played, the custom player displays a message indicating that the audio file is not currently available.
 
-The play/pause button uses a clean transparent interface without the browser's default audio-control styling.
+This allows the website to remain usable even when some recordings have not yet been released or uploaded.
 
-Content Organization
-Demo Tracks
-
-The Demo Tracks section contains the primary demonstration recordings for the cantata.
-
-Accompaniment
-
-The Accompaniment section provides instrumental/accompaniment recordings for rehearsal and preparation.
-
-Choral Parts
-
-The Choral Parts section organizes individual vocal recordings and allows users to select the available part they need.
-
-Music Sheet
-
-The Music Sheet section provides an embedded viewer for the official score.
-
-Responsive Behavior
-
-The application uses responsive styling to provide separate layout behavior for desktop and mobile screens.
-
-Desktop
-┌──────────────────────────────────────────────┐
-│                    Header                    │
-├──────────────────────────────────────────────┤
-│ Demo │ Accompaniment │ Parts │ Music Sheet   │
-├──────────────────────────────────────────────┤
-│                                              │
-│                   Content                    │
-│                                              │
-├──────────────────────────────────────────────┤
-│              Rose of Sharon FBC              │
-└──────────────────────────────────────────────┘
-Mobile
-┌──────────────────────┐
-│        Header        │
-├──────────────────────┤
-│ Demo   Accompaniment │
-│ Parts  Music Sheet   │
-├──────────────────────┤
-│                      │
-│      Track List      │
-│                      │
-│      Track List      │
-│                      │
-│      Track List      │
-│                      │
-└──────────────────────┘
-
-Mobile content is allowed to grow vertically so that the entire track list can be accessed through normal page scrolling.
-
-Installation
-
-Clone the repository:
-
-git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-
-Enter the project directory:
-
-cd YOUR-REPOSITORY
-
-Install dependencies:
-
-npm install
-
-Run the development server:
-
-npm run dev
-
-Open the local development server:
-
-http://localhost:3000
-Build
-
-Create a production build:
-
-npm run build
-
-Run the production server:
-
-npm start
-Deployment
+## Deployment
 
 The website is designed to be deployed using Vercel.
 
-After connecting the GitHub repository to Vercel, the application can automatically redeploy whenever changes are pushed to the configured branch.
+A typical deployment workflow is:
+
+```bash
+npm install
+npm run build
+npm run start
+```
+
+For development:
+
+```bash
+npm run dev
+```
+
+The development server can then be accessed through the local development address provided by Next.js.
+
+## GitHub
+
+The project can be maintained through Git and GitHub.
 
 Typical workflow:
 
+```bash
 git add .
 git commit -m "Update website"
 git push
+```
 
-Vercel then builds and deploys the updated application.
+After pushing changes to the connected repository, the deployment platform can automatically build and deploy the latest version.
 
-Updating Tracks
+## Environment
 
-To add or modify an audio track, edit:
+Before running the project, install the required dependencies:
 
-data/tracks.ts
+```bash
+npm install
+```
 
-Example:
+Then start the development server:
 
-{
-  id: "01",
-  title: "Overture",
-  url: "/audio/overture.mp3"
-}
+```bash
+npm run dev
+```
 
-If the audio file is hosted externally, the url can point to the appropriate hosted resource.
+## Copyright and Usage
 
-Updating the Cover
+The website is intended for ministry-related use and provides access to copyrighted musical materials.
 
-The main invitation artwork is loaded from:
+The content should only be accessed, distributed, or used according to the permissions and licensing associated with the musical work.
 
-/public/cover.jpg
+The website does not claim ownership of the underlying copyrighted music, recordings, or sheet music.
 
-Replacing this file with another image using the same filename updates the cover displayed on the website.
+## Credits
 
-Music Sheet
+### Musical Work
 
-The music sheet viewer uses a Google Drive preview URL:
+**Invitation to a Miracle**
 
-https://drive.google.com/file/d/FILE_ID/preview
+Composer:
 
-If the music sheet is replaced, update the corresponding Google Drive file ID in the Music Sheet section of the application.
+**Joseph M. Martin**
 
-Security and Content Protection
+### Ministry
 
-This website includes client-side measures intended to discourage unauthorized copying of the provided materials.
+**Rose of Sharon FBC**
 
-Implemented measures include:
+## Purpose
 
-Disabled context menu
-Disabled text selection
-Disabled mobile callouts
-Print Screen detection where supported
-Detection of common screenshot/browser shortcuts
-Print shortcut prevention
-Protected-content overlay
-Page visibility detection
-Disabled browser audio download controls
-Disabled Picture-in-Picture for the custom audio player
+The purpose of this project is to provide a convenient digital platform where participants can access the available resources for the **Invitation to a Miracle** cantata.
 
-These measures should not be considered a replacement for server-side authorization, DRM, access control, or copyright enforcement.
+Instead of distributing individual audio files and documents separately, the website organizes the available resources into a single responsive interface that can be accessed from desktop computers and mobile devices.
 
-Because the website runs inside a user's browser, determined users may still be able to capture content using operating-system-level screenshots, external recording devices, browser developer tools, or other methods.
+## Status
 
-Credits
+The website is actively maintained and can be updated as additional recordings, accompaniment tracks, choral parts, or other resources become available.
 
-Cantata: Invitation To A Miracle
+Future updates may include:
 
-Composer: Joseph M. Martin
+* Additional recordings
+* Additional choral parts
+* Updated accompaniment tracks
+* Improved mobile experience
+* Additional content protection improvements
+* User-interface improvements
+* Performance optimizations
 
-Organization: Rose of Sharon FBC
-
-Website developed as a private digital resource for accessing cantata rehearsal and performance materials.
-
-License
-
-This project is intended for private/ministry use.
-
-The musical recordings, sheet music, artwork, and other copyrighted materials contained or linked through this website remain the property of their respective copyright holders.
-
-Do not redistribute, reproduce, or publicly share copyrighted materials without appropriate permission.
-
-Invitation To A Miracle
-
-Experience the wonder, hope, and joy of the Advent season.
+```
+```
