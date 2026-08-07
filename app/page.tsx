@@ -197,7 +197,8 @@ export default function Home() {
           filter: isProtected
             ? "blur(20px)"
             : "none",
-          transition: "filter 0.2s ease",
+          transition:
+            "filter 0.2s ease",
         }}
       >
         <style
@@ -360,6 +361,17 @@ export default function Home() {
                   max-height: none !important;
                   overflow: visible !important;
                   flex: none !important;
+
+                  /*
+                   * MOBILE PDF ALIGNMENT FIX
+                   *
+                   * Keep the content area centered inside
+                   * the mobile screen and prevent the PDF
+                   * wrapper from inheriting the desktop
+                   * horizontal spacing.
+                   */
+                  padding-left: 10px !important;
+                  padding-right: 10px !important;
                 }
 
                 .header-card-mobile {
@@ -413,6 +425,13 @@ export default function Home() {
                   display: flex !important;
                   flex-direction: column !important;
                   overflow: visible !important;
+
+                  /*
+                   * Prevent flexbox from creating an
+                   * unexpected horizontal offset.
+                   */
+                  min-width: 0 !important;
+                  box-sizing: border-box !important;
                 }
 
                 .pdf-iframe-wrapper-mobile {
@@ -424,6 +443,16 @@ export default function Home() {
                   position: relative !important;
                   overflow: hidden !important;
                   border-radius: 14px !important;
+
+                  /*
+                   * MOBILE PDF ALIGNMENT FIX
+                   */
+                  box-sizing: border-box !important;
+                  margin-left: 0 !important;
+                  margin-right: 0 !important;
+                  padding: 0 !important;
+                  min-width: 0 !important;
+                  max-width: 100% !important;
                 }
 
                 .pdf-iframe-mobile {
@@ -432,6 +461,16 @@ export default function Home() {
                   min-height: 0 !important;
                   display: block !important;
                   border: none !important;
+
+                  /*
+                   * Prevent the iframe itself from
+                   * introducing a mobile horizontal
+                   * offset.
+                   */
+                  margin: 0 !important;
+                  padding: 0 !important;
+                  box-sizing: border-box !important;
+                  max-width: 100% !important;
                 }
 
                 .pdf-notice-mobile {
@@ -445,6 +484,7 @@ export default function Home() {
                   font-size: 0.72rem !important;
                   position: relative !important;
                   z-index: 2 !important;
+                  box-sizing: border-box !important;
                 }
 
                 /*
@@ -1220,7 +1260,9 @@ function AudioPlayer({
       time % 60
     );
 
-    return `${m}:${s < 10 ? "0" : ""}${s}`;
+    return `${m}:${
+      s < 10 ? "0" : ""
+    }${s}`;
   };
 
   /*
@@ -1356,9 +1398,10 @@ function AudioPlayer({
             textAlign: "center",
           }}
         >
-          ⚠️ The audio file is not
-          yet available. It will be
-          updated once released.
+          ⚠️ The audio file is
+          not yet available. It
+          will be updated once
+          released.
         </span>
       </div>
     );
