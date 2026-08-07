@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Music Ministry",
+  title: "Invitation To A Miracle",
   description: "Choral practice tracks and sheet music repository",
 };
 
