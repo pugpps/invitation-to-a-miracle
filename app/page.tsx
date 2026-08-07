@@ -474,7 +474,7 @@ function AudioPlayer({
         ref={audioRef}
         src={url}
         controlsList="nodownload"
-        disablePictureInPicture
+        {...({ disablePictureInPicture: true } as any)}
         onContextMenu={(e) => e.preventDefault()}
         onError={() => setHasError(true)}
         onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
@@ -511,7 +511,6 @@ function AudioPlayer({
 
 const styles: Record<string, React.CSSProperties> = {
   main: {
-    height: "100vh",
     height: "100dvh",
     display: "flex",
     flexDirection: "column",
