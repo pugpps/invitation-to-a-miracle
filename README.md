@@ -280,7 +280,7 @@ Composer:
 
 **Joseph M. Martin**
 
-### Ministry
+### Property
 
 **Rose of Sharon FBC**
 
@@ -305,4 +305,5 @@ Future updates may include:
 * Performance optimizations
 
 ```
+Created by: Jeshua Emmanuel L. Cabading
 ```
