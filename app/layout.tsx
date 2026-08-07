@@ -12,7 +12,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
+export const metadata: Metadata = {
   title: "Invitation To A Miracle",
   description: "Choral practice tracks and sheet music repository",
 };

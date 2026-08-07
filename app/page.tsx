@@ -1,23 +1,44 @@
 "use client";
+
 import { useState, useRef, useEffect } from "react";
-import { 
-  demoTracks, 
-  accompanimentTracks, 
-  partsTracks, 
-  type Track, 
-  type PartTrack, 
-  type PartLink, 
-  type CategoryKey 
+import {
+  demoTracks,
+  accompanimentTracks,
+  partsTracks,
+  type Track,
+  type PartTrack,
+  type PartLink,
+  type CategoryKey,
 } from "../data/tracks";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<CategoryKey>("demo");
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
   const [isProtected, setIsProtected] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setPlayingUrl(null);
   }, [activeTab]);
+
+  useEffect(() => {
+    const widthMql = window.matchMedia("(max-width: 768px)");
+    const pointerMql = window.matchMedia("(pointer: coarse)");
+
+    const update = () => {
+      setIsMobile(widthMql.matches || pointerMql.matches);
+    };
+
+    update();
+
+    widthMql.addEventListener("change", update);
+    pointerMql.addEventListener("change", update);
+
+    return () => {
+      widthMql.removeEventListener("change", update);
+      pointerMql.removeEventListener("change", update);
+    };
+  }, []);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -31,12 +52,17 @@ export default function Home() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
         e.key === "PrintScreen" ||
-        (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s" || e.key === "I" || e.key === "i" || e.key === "C" || e.key === "c")) ||
-        (e.ctrlKey && (e.key === "p" || e.key === "P" || e.key === "s" || e.key === "S"))
+        (e.ctrlKey &&
+          e.shiftKey &&
+          ["S", "s", "I", "i", "C", "c"].includes(e.key)) ||
+        (e.ctrlKey && ["p", "P", "s", "S"].includes(e.key))
       ) {
         e.preventDefault();
         setIsProtected(true);
-        setTimeout(() => setIsProtected(false), 2500);
+
+        setTimeout(() => {
+          setIsProtected(false);
+        }, 2500);
       }
     };
 
@@ -44,18 +70,28 @@ export default function Home() {
       e.preventDefault();
     };
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
     window.addEventListener("keydown", handleKeyDown);
     document.addEventListener("contextmenu", handleContextClick);
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
       window.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("contextmenu", handleContextClick);
     };
   }, []);
 
-  const categories: { key: CategoryKey; label: string; icon: string }[] = [
+  const categories: {
+    key: CategoryKey;
+    label: string;
+    icon: string;
+  }[] = [
     { key: "demo", label: "Demo Tracks", icon: "🎵" },
     { key: "accompaniment", label: "Accompaniment", icon: "🎹" },
     { key: "parts", label: "Choral Parts", icon: "🎼" },
@@ -64,113 +100,264 @@ export default function Home() {
 
   return (
     <>
-      <main style={{ ...styles.main, filter: isProtected ? "blur(20px)" : "none", transition: "filter 0.2s ease" }}>
-        <style dangerouslySetInnerHTML={{__html: `
-          @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+      <main
+        style={{
+          ...styles.main,
+          filter: isProtected ? "blur(20px)" : "none",
+          transition: "filter 0.2s ease",
+        }}
+      >
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
 
-          html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            -webkit-user-select: none;
-            user-select: none;
-            background-color: #030712;
-          }
+              html,
+              body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                -webkit-user-select: none;
+                user-select: none;
+                background-color: #030712;
+                -webkit-tap-highlight-color: transparent !important;
+              }
 
-          .poster-title-top {
-            font-family: 'Cinzel', serif;
-            letter-spacing: 0.12em;
-            font-weight: 600;
-          }
+              *,
+              *:before,
+              *:after {
+                -webkit-tap-highlight-color: transparent !important;
+                -webkit-touch-callout: none;
+                box-sizing: border-box;
+              }
 
-          .poster-title-script {
-            font-family: 'Great Vibes', cursive;
-            text-transform: none !important;
-            font-weight: 400;
-            color: #fef08a;
-            font-size: 1.35em;
-            margin-left: 6px;
-            text-shadow: 0 0 25px rgba(250, 204, 21, 0.4);
-          }
+              button,
+              input,
+              a,
+              div {
+                -webkit-tap-highlight-color: transparent !important;
+              }
 
-          .celestial-scroll::-webkit-scrollbar {
-            width: 5px;
-          }
-          .celestial-scroll::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.4);
-            border-radius: 10px;
-          }
-          .celestial-scroll::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, #38bdf8, #818cf8);
-            border-radius: 10px;
-          }
-          .celestial-scroll::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(to bottom, #7dd3fc, #a5b4fc);
-          }
+              button:focus,
+              button:active,
+              button:hover,
+              input:focus,
+              input:active {
+                outline: none !important;
+              }
 
-          @keyframes celestialFade {
-            0% { opacity: 0; transform: translateY(12px) scale(0.99); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-          }
+              .poster-title-top {
+                font-family: 'Cinzel', serif;
+                letter-spacing: 0.12em;
+                font-weight: 600;
+              }
 
-          .celestial-anim {
-            opacity: 0;
-            animation: celestialFade 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          }
+              .poster-title-script {
+                font-family: 'Great Vibes', cursive;
+                text-transform: none !important;
+                font-weight: 400;
+                color: #fef08a;
+                font-size: 1.35em;
+                margin-left: 6px;
+                text-shadow: 0 0 25px rgba(250, 204, 21, 0.4);
+              }
 
-          @keyframes beamGlow {
-            0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
-            50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
-          }
+              .celestial-scroll::-webkit-scrollbar {
+                width: 5px;
+              }
 
-          .divine-beam {
-            animation: beamGlow 6s ease-in-out infinite;
-          }
+              .celestial-scroll::-webkit-scrollbar-track {
+                background: rgba(15, 23, 42, 0.4);
+                border-radius: 10px;
+              }
 
-          @media screen and (max-width: 640px) {
-            .header-card-mobile {
-              flex-direction: column !important;
-              align-items: center !important;
-              text-align: center !important;
-              padding: 14px !important;
-              gap: 12px !important;
-            }
-            .header-info-mobile {
-              align-items: center !important;
-              text-align: center !important;
-            }
-            .description-mobile {
-              text-align: justify !important;
-              text-justify: inter-word !important;
-            }
-          }
-        `}} />
+              .celestial-scroll::-webkit-scrollbar-thumb {
+                background: linear-gradient(to bottom, #38bdf8, #818cf8);
+                border-radius: 10px;
+              }
+
+              .celestial-scroll::-webkit-scrollbar-thumb:hover {
+                background: linear-gradient(to bottom, #7dd3fc, #a5b4fc);
+              }
+
+              @keyframes celestialFade {
+                0% {
+                  opacity: 0;
+                  transform: translateY(12px) scale(0.99);
+                }
+
+                100% {
+                  opacity: 1;
+                  transform: translateY(0) scale(1);
+                }
+              }
+
+              .celestial-anim {
+                opacity: 0;
+                animation: celestialFade 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+              }
+
+              @keyframes beamGlow {
+                0%,
+                100% {
+                  opacity: 0.7;
+                  transform: translateX(-50%) scale(1);
+                }
+
+                50% {
+                  opacity: 1;
+                  transform: translateX(-50%) scale(1.05);
+                }
+              }
+
+              .divine-beam {
+                animation: beamGlow 6s ease-in-out infinite;
+              }
+
+              @media screen and (max-width: 768px) {
+                html,
+                body {
+                  height: auto !important;
+                  min-height: 0 !important;
+                  overflow-x: hidden !important;
+                  overflow-y: auto !important;
+                  -webkit-overflow-scrolling: touch;
+                }
+
+                main {
+                  position: relative !important;
+                  top: auto !important;
+                  left: auto !important;
+                  right: auto !important;
+                  bottom: auto !important;
+                  height: auto !important;
+                  min-height: 0 !important;
+                  max-height: none !important;
+                  overflow: visible !important;
+                  padding: 8px 10px 8px 10px !important;
+                }
+
+                .mobile-container-override {
+                  height: auto !important;
+                  min-height: 0 !important;
+                  max-height: none !important;
+                  overflow: visible !important;
+                  flex: none !important;
+                }
+
+                .mobile-content-override {
+                  height: auto !important;
+                  min-height: 0 !important;
+                  max-height: none !important;
+                  overflow: visible !important;
+                  flex: none !important;
+                }
+
+                .header-card-mobile {
+                  flex-direction: row !important;
+                  align-items: center !important;
+                  text-align: left !important;
+                  padding: 10px 12px !important;
+                  gap: 12px !important;
+                  margin-bottom: 8px !important;
+                }
+
+                .header-info-mobile {
+                  align-items: flex-start !important;
+                  text-align: left !important;
+                }
+
+                .header-cover-img {
+                  width: 75px !important;
+                }
+
+                .description-mobile {
+                  display: block !important;
+                  font-size: 0.72rem !important;
+                  line-height: 1.25 !important;
+                }
+
+                .poster-title-top {
+                  letter-spacing: 0.02em !important;
+                }
+
+                .poster-title-script {
+                  font-size: 1.15em !important;
+                  margin-left: 3px !important;
+                }
+
+                .celestial-scroll {
+                  overflow: visible !important;
+                }
+
+                .footer-mobile {
+                  margin-bottom: 0 !important;
+                  padding-bottom: 0 !important;
+                }
+              }
+            `,
+          }}
+        />
 
         <div style={styles.divineBeam} />
         <div style={styles.glowNebula} />
         <div style={styles.glowBase} />
 
-        <div style={styles.container}>
-          <header className="header-card-mobile" style={styles.headerCard}>
+        <div
+          className="mobile-container-override"
+          style={{
+            ...styles.container,
+            ...(isMobile
+              ? {
+                  height: "auto",
+                  minHeight: 0,
+                  overflow: "visible",
+                }
+              : {}),
+          }}
+        >
+          <header
+            className="header-card-mobile"
+            style={styles.headerCard}
+          >
             <div style={styles.coverWrapper}>
               <div style={styles.badge}>CANTATA</div>
+
               <img
                 src="/cover.jpg"
                 alt="Invitation to a Miracle"
+                className="header-cover-img"
                 style={styles.coverImage}
                 draggable="false"
               />
             </div>
 
-            <div className="header-info-mobile" style={styles.headerInfo}>
+            <div
+              className="header-info-mobile"
+              style={styles.headerInfo}
+            >
               <span style={styles.subtitle}>JOSEPH M. MARTIN</span>
+
               <h1 style={styles.title}>
-                <span className="poster-title-top">Invitation To A</span>
-                <span className="poster-title-script">Miracle</span>
+                <span className="poster-title-top">
+                  Invitation To A
+                </span>
+
+                <span className="poster-title-script">
+                  Miracle
+                </span>
               </h1>
-              <p className="description-mobile" style={styles.description}>
-                Experience the wonder, hope, and joy of the Advent season. Featuring Celtic-inspired melodies and deeply moving choral harmonies, this musical celebration is a passionate call to reflect on the divine mystery and miraculous birth of Christ.
+
+              <p
+                className="description-mobile"
+                style={styles.description}
+              >
+                Experience the wonder, hope, and joy of the Advent
+                season. Featuring Celtic-inspired melodies and deeply
+                moving choral harmonies, this musical celebration is
+                a passionate call to reflect on the divine mystery
+                and miraculous birth of Christ.
               </p>
             </div>
           </header>
@@ -178,6 +365,7 @@ export default function Home() {
           <nav style={styles.tabContainer}>
             {categories.map((cat) => {
               const isActive = activeTab === cat.key;
+
               return (
                 <button
                   key={cat.key}
@@ -194,18 +382,58 @@ export default function Home() {
             })}
           </nav>
 
-          <section className="celestial-scroll" style={styles.contentSection}>
+          <section
+            className="celestial-scroll mobile-content-override"
+            style={{
+              ...styles.contentSection,
+              ...(isMobile
+                ? {
+                    flex: "none",
+                    height: "auto",
+                    minHeight: 0,
+                    maxHeight: "none",
+                    overflow: "visible",
+                  }
+                : {}),
+            }}
+          >
             {activeTab === "demo" && (
-              <TrackList tracks={demoTracks} playingUrl={playingUrl} setPlayingUrl={setPlayingUrl} />
+              <TrackList
+                tracks={demoTracks}
+                playingUrl={playingUrl}
+                setPlayingUrl={setPlayingUrl}
+                isMobile={isMobile}
+              />
             )}
+
             {activeTab === "accompaniment" && (
-              <TrackList tracks={accompanimentTracks} playingUrl={playingUrl} setPlayingUrl={setPlayingUrl} />
+              <TrackList
+                tracks={accompanimentTracks}
+                playingUrl={playingUrl}
+                setPlayingUrl={setPlayingUrl}
+                isMobile={isMobile}
+              />
             )}
+
             {activeTab === "parts" && (
-              <PartsList tracks={partsTracks} playingUrl={playingUrl} setPlayingUrl={setPlayingUrl} />
+              <PartsList
+                tracks={partsTracks}
+                playingUrl={playingUrl}
+                setPlayingUrl={setPlayingUrl}
+                isMobile={isMobile}
+              />
             )}
+
             {activeTab === "pdf" && (
-              <div className="celestial-anim" style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+              <div
+                className="celestial-anim"
+                style={{
+                  width: "100%",
+                  height: isMobile ? "70vh" : "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 <div style={styles.iframeWrapper}>
                   <iframe
                     src="https://drive.google.com/file/d/1lJ-flEO12RYjixztK1LWbSTRb9UVcjGl/preview?usp=drivesdk"
@@ -214,14 +442,21 @@ export default function Home() {
                     allow="autoplay"
                   />
                 </div>
+
                 <div style={styles.pdfProtectionNotice}>
-                  <span>🔒 Embedded View: Official sheet music score loaded securely.</span>
+                  <span>
+                    🔒 Embedded View: Official sheet music score
+                    loaded securely.
+                  </span>
                 </div>
               </div>
             )}
           </section>
 
-          <footer style={styles.footer}>
+          <footer
+            className="footer-mobile"
+            style={styles.footer}
+          >
             <p style={styles.footerText}>
               Rose of Sharon FBC
             </p>
@@ -232,10 +467,35 @@ export default function Home() {
       {isProtected && (
         <div style={styles.screenshotShieldModal}>
           <div style={styles.shieldBox}>
-            <span style={{ fontSize: "2rem", display: "block", marginBottom: "8px" }}>🛡️</span>
-            <h3 style={{ margin: "0 0 6px 0", color: "#f8fafc", fontSize: "1.2rem" }}>Protected Content</h3>
-            <p style={{ margin: 0, color: "#94a3b8", fontSize: "0.88rem" }}>
-              Screenshots and screen capturing are restricted to protect copyrighted ministry materials.
+            <span
+              style={{
+                fontSize: "2rem",
+                display: "block",
+                marginBottom: "8px",
+              }}
+            >
+              🛡️
+            </span>
+
+            <h3
+              style={{
+                margin: "0 0 6px 0",
+                color: "#f8fafc",
+                fontSize: "1.2rem",
+              }}
+            >
+              Protected Content
+            </h3>
+
+            <p
+              style={{
+                margin: 0,
+                color: "#94a3b8",
+                fontSize: "0.88rem",
+              }}
+            >
+              Screenshots and screen capturing are restricted to
+              protect copyrighted ministry materials.
             </p>
           </div>
         </div>
@@ -244,32 +504,48 @@ export default function Home() {
   );
 }
 
-function TrackList({ 
-  tracks, 
-  playingUrl, 
-  setPlayingUrl 
-}: { 
-  tracks: Track[]; 
-  playingUrl: string | null; 
+function TrackList({
+  tracks,
+  playingUrl,
+  setPlayingUrl,
+  isMobile,
+}: {
+  tracks: Track[];
+  playingUrl: string | null;
   setPlayingUrl: (url: string | null) => void;
+  isMobile: boolean;
 }) {
   return (
     <div style={styles.listContainer}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+        }}
+      >
         {tracks.map((track, index) => (
-          <div 
-            key={track.id} 
+          <div
+            key={track.id}
             className="celestial-anim"
-            style={{ ...styles.trackRow, animationDelay: `${index * 0.05}s` }}
+            style={{
+              ...styles.trackRow,
+              animationDelay: `${index * 0.05}s`,
+            }}
           >
             <div style={styles.trackHeader}>
               <div style={styles.trackIcon}>🎧</div>
-              <div style={styles.trackTitle}>{track.title}</div>
+
+              <div style={styles.trackTitle}>
+                {track.title}
+              </div>
             </div>
-            <AudioPlayer 
-              url={track.url} 
-              playingUrl={playingUrl} 
-              setPlayingUrl={setPlayingUrl} 
+
+            <AudioPlayer
+              url={track.url}
+              playingUrl={playingUrl}
+              setPlayingUrl={setPlayingUrl}
+              isMobile={isMobile}
             />
           </div>
         ))}
@@ -278,25 +554,34 @@ function TrackList({
   );
 }
 
-function PartsList({ 
-  tracks, 
-  playingUrl, 
-  setPlayingUrl 
-}: { 
-  tracks: PartTrack[]; 
-  playingUrl: string | null; 
+function PartsList({
+  tracks,
+  playingUrl,
+  setPlayingUrl,
+  isMobile,
+}: {
+  tracks: PartTrack[];
+  playingUrl: string | null;
   setPlayingUrl: (url: string | null) => void;
+  isMobile: boolean;
 }) {
   return (
     <div style={styles.listContainer}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+        }}
+      >
         {tracks.map((track, index) => (
-          <PartRow 
-            key={track.id} 
-            track={track} 
+          <PartRow
+            key={track.id}
+            track={track}
             index={index}
-            playingUrl={playingUrl} 
-            setPlayingUrl={setPlayingUrl} 
+            playingUrl={playingUrl}
+            setPlayingUrl={setPlayingUrl}
+            isMobile={isMobile}
           />
         ))}
       </div>
@@ -304,18 +589,21 @@ function PartsList({
   );
 }
 
-function PartRow({ 
-  track, 
+function PartRow({
+  track,
   index,
-  playingUrl, 
-  setPlayingUrl 
-}: { 
-  track: PartTrack; 
+  playingUrl,
+  setPlayingUrl,
+  isMobile,
+}: {
+  track: PartTrack;
   index: number;
-  playingUrl: string | null; 
+  playingUrl: string | null;
   setPlayingUrl: (url: string | null) => void;
+  isMobile: boolean;
 }) {
-  const [activePart, setActivePart] = useState<PartLink | null>(null);
+  const [activePart, setActivePart] =
+    useState<PartLink | null>(null);
 
   const togglePart = (link: PartLink) => {
     if (activePart?.url === link.url) {
@@ -325,27 +613,41 @@ function PartRow({
     }
   };
 
-  const hasParts = track.links && track.links.length > 0;
+  const hasParts =
+    track.links && track.links.length > 0;
 
   return (
-    <div className="celestial-anim" style={{ ...styles.partRow, animationDelay: `${index * 0.05}s` }}>
+    <div
+      className="celestial-anim"
+      style={{
+        ...styles.partRow,
+        animationDelay: `${index * 0.05}s`,
+      }}
+    >
       <div style={styles.trackHeader}>
         <div style={styles.trackIcon}>🎼</div>
-        <div style={styles.trackTitle}>{track.title}</div>
+
+        <div style={styles.trackTitle}>
+          {track.title}
+        </div>
       </div>
-      
+
       {hasParts ? (
         <>
           <div style={styles.partsGrid}>
             {track.links.map((link, linkIndex) => {
-              const isActive = activePart?.url === link.url;
+              const isActive =
+                activePart?.url === link.url;
+
               return (
                 <button
                   key={linkIndex}
                   onClick={() => togglePart(link)}
                   style={{
                     ...styles.partButton,
-                    ...(isActive ? styles.partButtonActive : {}),
+                    ...(isActive
+                      ? styles.partButtonActive
+                      : {}),
                   }}
                 >
                   {link.label}
@@ -355,23 +657,49 @@ function PartRow({
           </div>
 
           {activePart && (
-            <div className="celestial-anim" style={{ ...styles.activePartContainer, animationDelay: "0s" }}>
+            <div
+              className="celestial-anim"
+              style={{
+                ...styles.activePartContainer,
+                animationDelay: "0s",
+              }}
+            >
               <div style={styles.activePartLabel}>
-                <span style={{ color: "#38bdf8" }}>▶</span> Playing: {activePart.label}
+                <span style={{ color: "#38bdf8" }}>
+                  ▶
+                </span>
+
+                Playing: {activePart.label}
               </div>
-              <AudioPlayer 
-                url={activePart.url} 
-                autoPlay={true} 
-                playingUrl={playingUrl} 
-                setPlayingUrl={setPlayingUrl} 
+
+              <AudioPlayer
+                url={activePart.url}
+                autoPlay={true}
+                playingUrl={playingUrl}
+                setPlayingUrl={setPlayingUrl}
+                isMobile={isMobile}
               />
             </div>
           )}
         </>
       ) : (
-        <div style={{ ...styles.customPlayer, justifyContent: "center", marginTop: "6px" }}>
-          <span style={{ color: "#f87171", fontSize: "0.85rem", fontWeight: 500, textAlign: "center" }}>
-            ⚠️ The audio file is not yet available. It will be updated once released.
+        <div
+          style={{
+            ...styles.customPlayer,
+            justifyContent: "center",
+            marginTop: "6px",
+          }}
+        >
+          <span
+            style={{
+              color: "#f87171",
+              fontSize: "0.85rem",
+              fontWeight: 500,
+              textAlign: "center",
+            }}
+          >
+            ⚠️ The audio file is not yet available. It will be
+            updated once released.
           </span>
         </div>
       )}
@@ -379,49 +707,62 @@ function PartRow({
   );
 }
 
-function AudioPlayer({ 
-  url, 
-  autoPlay = false, 
-  playingUrl, 
-  setPlayingUrl 
-}: { 
-  url: string; 
+function AudioPlayer({
+  url,
+  autoPlay = false,
+  playingUrl,
+  setPlayingUrl,
+  isMobile,
+}: {
+  url: string;
   autoPlay?: boolean;
   playingUrl: string | null;
   setPlayingUrl: (url: string | null) => void;
+  isMobile: boolean;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    if (playingUrl && playingUrl !== url && isPlaying) {
+    if (
+      playingUrl &&
+      playingUrl !== url &&
+      isPlaying
+    ) {
       if (audioRef.current) {
         audioRef.current.pause();
       }
+
       setIsPlaying(false);
     }
   }, [playingUrl, url, isPlaying]);
 
   useEffect(() => {
     setHasError(false);
+
     if (!url) {
       setHasError(true);
       return;
     }
-    
+
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.load();
+
       if (autoPlay) {
-        audioRef.current.play()
+        audioRef.current
+          .play()
           .then(() => {
             setIsPlaying(true);
             setPlayingUrl(url);
           })
-          .catch(() => setIsPlaying(false));
+          .catch(() => {
+            setIsPlaying(false);
+          });
       } else {
         setIsPlaying(false);
       }
@@ -430,8 +771,10 @@ function AudioPlayer({
 
   const formatTime = (time: number) => {
     if (isNaN(time)) return "0:00";
+
     const m = Math.floor(time / 60);
     const s = Math.floor(time % 60);
+
     return `${m}:${s < 10 ? "0" + s : s}`;
   };
 
@@ -442,12 +785,15 @@ function AudioPlayer({
         setIsPlaying(false);
         setPlayingUrl(null);
       } else {
-        audioRef.current.play()
+        audioRef.current
+          .play()
           .then(() => {
             setIsPlaying(true);
             setPlayingUrl(url);
           })
-          .catch(() => setHasError(true));
+          .catch(() => {
+            setHasError(true);
+          });
       }
     }
   };
@@ -460,9 +806,22 @@ function AudioPlayer({
 
   if (hasError) {
     return (
-      <div style={{ ...styles.customPlayer, justifyContent: "center" }}>
-        <span style={{ color: "#f87171", fontSize: "0.85rem", fontWeight: 500, textAlign: "center" }}>
-          ⚠️ The audio file is not yet available. It will be updated once released.
+      <div
+        style={{
+          ...styles.customPlayer,
+          justifyContent: "center",
+        }}
+      >
+        <span
+          style={{
+            color: "#f87171",
+            fontSize: "0.85rem",
+            fontWeight: 500,
+            textAlign: "center",
+          }}
+        >
+          ⚠️ The audio file is not yet available. It will be
+          updated once released.
         </span>
       </div>
     );
@@ -474,23 +833,36 @@ function AudioPlayer({
         ref={audioRef}
         src={url}
         controlsList="nodownload"
-        {...({ disablePictureInPicture: true } as any)}
+        {...({
+          disablePictureInPicture: true,
+        } as any)}
         onContextMenu={(e) => e.preventDefault()}
         onError={() => setHasError(true)}
-        onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
-        onLoadedMetadata={() => setDuration(audioRef.current?.duration || 0)}
+        onTimeUpdate={() =>
+          setCurrentTime(
+            audioRef.current?.currentTime || 0
+          )
+        }
+        onLoadedMetadata={() =>
+          setDuration(
+            audioRef.current?.duration || 0
+          )
+        }
         onEnded={() => {
           setIsPlaying(false);
-          if (playingUrl === url) setPlayingUrl(null);
+
+          if (playingUrl === url) {
+            setPlayingUrl(null);
+          }
         }}
+        style={{ display: "none" }}
       />
-      <div style={styles.playerControls}>
-        <button onClick={() => handleSkip(-5)} style={styles.controlBtn}>↺ 5s</button>
-        <button onClick={togglePlay} style={styles.playBtn}>{isPlaying ? "⏸" : "▶"}</button>
-        <button onClick={() => handleSkip(5)} style={styles.controlBtn}>↻ 5s</button>
-      </div>
+
       <div style={styles.progressContainer}>
-        <span style={styles.timeText}>{formatTime(currentTime)}</span>
+        <span style={styles.timeText}>
+          {formatTime(currentTime)}
+        </span>
+
         <input
           type="range"
           min="0"
@@ -498,12 +870,45 @@ function AudioPlayer({
           value={currentTime}
           onChange={(e) => {
             const newTime = Number(e.target.value);
+
             setCurrentTime(newTime);
-            if (audioRef.current) audioRef.current.currentTime = newTime;
+
+            if (audioRef.current) {
+              audioRef.current.currentTime =
+                newTime;
+            }
           }}
           style={styles.progressBar}
         />
-        <span style={styles.timeText}>{formatTime(duration)}</span>
+
+        <span style={styles.timeText}>
+          {formatTime(duration)}
+        </span>
+      </div>
+
+      <div style={styles.playerControls}>
+        <button
+          onClick={() => handleSkip(-5)}
+          style={styles.controlBtn}
+        >
+          ↺ 5s
+        </button>
+
+        <button
+          onClick={togglePlay}
+          style={styles.playBtn}
+        >
+          <span style={styles.playIcon}>
+            {isPlaying ? "⏸" : "▶"}
+          </span>
+        </button>
+
+        <button
+          onClick={() => handleSkip(5)}
+          style={styles.controlBtn}
+        >
+          ↻ 5s
+        </button>
       </div>
     </div>
   );
@@ -515,7 +920,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     backgroundColor: "#030712",
-    backgroundImage: "radial-gradient(circle at 50% 15%, #0f172a 0%, #030712 75%)",
+    backgroundImage:
+      "radial-gradient(circle at 50% 15%, #0f172a 0%, #030712 75%)",
     color: "#f8fafc",
     fontFamily: "'Plus Jakarta Sans', sans-serif",
     position: "fixed",
@@ -524,39 +930,47 @@ const styles: Record<string, React.CSSProperties> = {
     right: 0,
     bottom: 0,
     overflow: "hidden",
-    padding: "clamp(12px, 2vh, 20px) clamp(16px, 4vw, 24px)",
+    padding:
+      "clamp(12px, 2vh, 20px) clamp(16px, 4vw, 24px)",
     boxSizing: "border-box",
   },
+
   divineBeam: {
     position: "absolute",
     top: "-30px",
     left: "50%",
     width: "700px",
     height: "350px",
-    background: "radial-gradient(ellipse at top, rgba(253, 224, 71, 0.14) 0%, rgba(56, 189, 248, 0.08) 40%, transparent 75%)",
+    background:
+      "radial-gradient(ellipse at top, rgba(253, 224, 71, 0.14) 0%, rgba(56, 189, 248, 0.08) 40%, transparent 75%)",
     pointerEvents: "none",
     filter: "blur(20px)",
   },
+
   glowNebula: {
     position: "absolute",
     top: "25%",
     left: "15%",
     width: "450px",
     height: "450px",
-    background: "radial-gradient(circle, rgba(30, 58, 138, 0.25) 0%, transparent 70%)",
+    background:
+      "radial-gradient(circle, rgba(30, 58, 138, 0.25) 0%, transparent 70%)",
     pointerEvents: "none",
     filter: "blur(50px)",
   },
+
   glowBase: {
     position: "absolute",
     bottom: "-100px",
     right: "10%",
     width: "500px",
     height: "500px",
-    background: "radial-gradient(circle, rgba(88, 28, 135, 0.18) 0%, transparent 70%)",
+    background:
+      "radial-gradient(circle, rgba(88, 28, 135, 0.18) 0%, transparent 70%)",
     pointerEvents: "none",
     filter: "blur(60px)",
   },
+
   container: {
     maxWidth: "1100px",
     width: "100%",
@@ -569,10 +983,11 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     overflow: "hidden",
   },
+
   headerCard: {
     display: "flex",
     flexShrink: 0,
-    gap: "clamp(16px, 4vw, 36px)",
+    gap: "clamp(12px, 3vw, 36px)",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(15, 23, 42, 0.75)",
@@ -582,17 +997,21 @@ const styles: Record<string, React.CSSProperties> = {
     borderStyle: "solid",
     borderColor: "rgba(56, 189, 248, 0.2)",
     borderRadius: "20px",
-    padding: "clamp(10px, 2vh, 20px) clamp(16px, 4vw, 28px)",
+    padding:
+      "clamp(10px, 2vh, 20px) clamp(14px, 4vw, 28px)",
     marginBottom: "10px",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     boxSizing: "border-box",
-    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1)",
+    boxShadow:
+      "0 25px 50px -12px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1)",
   },
+
   coverWrapper: {
     position: "relative",
     flexShrink: 0,
-    width: "clamp(75px, 14vh, 120px)",
+    width: "clamp(65px, 12vw, 120px)",
   },
+
   badge: {
     position: "absolute",
     top: "6px",
@@ -600,57 +1019,69 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "rgba(99, 102, 241, 0.9)",
     backdropFilter: "blur(6px)",
     color: "#e0e7ff",
-    fontSize: "0.6rem",
+    fontSize: "0.55rem",
     fontWeight: 700,
-    padding: "2px 6px",
+    padding: "2px 5px",
     borderRadius: "20px",
     textTransform: "uppercase",
     letterSpacing: "0.08em",
     zIndex: 2,
-    boxShadow: "0 4px 12px rgba(99, 102, 241, 0.4)",
+    boxShadow:
+      "0 4px 12px rgba(99, 102, 241, 0.4)",
   },
+
   coverImage: {
     width: "100%",
     height: "auto",
     display: "block",
     borderRadius: "10px",
-    boxShadow: "0 15px 35px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08)",
+    boxShadow:
+      "0 15px 35px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08)",
   },
+
   headerInfo: {
-    flex: "1 1 280px",
+    flex: 1,
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "flex-start",
+    minWidth: 0,
   },
+
   subtitle: {
     color: "#38bdf8",
-    fontSize: "0.75rem",
+    fontSize: "clamp(0.65rem, 1.2vw, 0.75rem)",
     fontWeight: 600,
     textTransform: "uppercase",
     letterSpacing: "0.15em",
     display: "block",
     marginBottom: "2px",
   },
+
   title: {
-    fontSize: "clamp(1.2rem, 3vh, 2.2rem)",
-    margin: "0 0 4px 0",
+    fontSize: "clamp(0.95rem, 4.6vw, 2.2rem)",
+    margin: "6px 0 4px 0",
     fontWeight: 700,
     color: "#ffffff",
-    lineHeight: 1.15,
+    lineHeight: 1.5,
     display: "flex",
-    flexWrap: "wrap",
-    alignItems: "baseline",
+    flexWrap: "nowrap",
+    whiteSpace: "nowrap",
+    alignItems: "center",
+    width: "100%",
+    overflow: "visible",
   },
+
   description: {
     margin: 0,
     color: "#94a3b8",
-    fontSize: "clamp(0.8rem, 1.6vh, 0.9rem)",
-    lineHeight: 1.4,
+    fontSize: "clamp(0.7rem, 1.4vw, 0.9rem)",
+    lineHeight: 1.35,
     width: "100%",
     textAlign: "justify",
     textJustify: "inter-word",
   },
+
   tabContainer: {
     display: "flex",
     flexShrink: 0,
@@ -659,6 +1090,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: "8px",
     marginBottom: "10px",
   },
+
   tabButton: {
     display: "flex",
     alignItems: "center",
@@ -674,16 +1106,20 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     cursor: "pointer",
     whiteSpace: "nowrap",
-    transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+    transition:
+      "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
   },
+
   tabActive: {
     backgroundColor: "#0284c7",
     borderColor: "#38bdf8",
     color: "#ffffff",
-    boxShadow: "0 0 25px rgba(56, 189, 248, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3)",
+    boxShadow:
+      "0 0 25px rgba(56, 189, 248, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3)",
     transform: "translateY(-1px)",
   },
+
   contentSection: {
     flex: 1,
     overflowY: "auto",
@@ -697,8 +1133,10 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "20px",
     padding: "16px 24px",
     boxSizing: "border-box",
-    boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.05)",
+    boxShadow:
+      "inset 0 1px 1px rgba(255, 255, 255, 0.05)",
   },
+
   iframeWrapper: {
     position: "relative",
     width: "100%",
@@ -706,15 +1144,18 @@ const styles: Record<string, React.CSSProperties> = {
     minHeight: "100%",
     borderRadius: "14px",
     overflow: "hidden",
-    border: "1px solid rgba(56, 189, 248, 0.2)",
+    border:
+      "1px solid rgba(56, 189, 248, 0.2)",
     backgroundColor: "#0b0f19",
   },
+
   iframeStyle: {
     width: "100%",
     height: "100%",
     minHeight: "100%",
     border: "none",
   },
+
   pdfProtectionNotice: {
     marginTop: "8px",
     textAlign: "center",
@@ -722,26 +1163,32 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "0.8rem",
     letterSpacing: "0.03em",
   },
+
   listContainer: {
     display: "flex",
     flexDirection: "column",
     paddingTop: "4px",
     paddingBottom: "4px",
   },
+
   trackRow: {
     display: "flex",
     flexDirection: "column",
     gap: "10px",
     padding: "12px 16px",
-    backgroundColor: "rgba(30, 41, 59, 0.55)",
+    backgroundColor:
+      "rgba(30, 41, 59, 0.55)",
     borderWidth: "1px",
     borderStyle: "solid",
-    borderColor: "rgba(255, 255, 255, 0.06)",
+    borderColor:
+      "rgba(255, 255, 255, 0.06)",
     borderRadius: "14px",
     transition: "all 0.2s ease",
     boxSizing: "border-box",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    boxShadow:
+      "0 4px 12px rgba(0, 0, 0, 0.15)",
   },
+
   trackHeader: {
     display: "flex",
     alignItems: "center",
@@ -749,18 +1196,22 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     flex: 1,
   },
+
   trackIcon: {
     width: "34px",
     height: "34px",
     borderRadius: "50%",
-    backgroundColor: "rgba(56, 189, 248, 0.15)",
+    backgroundColor:
+      "rgba(56, 189, 248, 0.15)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: "1rem",
     flexShrink: 0,
-    boxShadow: "0 0 10px rgba(56, 189, 248, 0.2)",
+    boxShadow:
+      "0 0 10px rgba(56, 189, 248, 0.2)",
   },
+
   trackTitle: {
     fontSize: "1rem",
     fontWeight: 500,
@@ -768,25 +1219,32 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.4,
     flex: 1,
   },
+
   partRow: {
     display: "flex",
     flexDirection: "column",
     gap: "10px",
     padding: "12px 16px",
-    backgroundColor: "rgba(30, 41, 59, 0.55)",
+    backgroundColor:
+      "rgba(30, 41, 59, 0.55)",
     borderWidth: "1px",
     borderStyle: "solid",
-    borderColor: "rgba(255, 255, 255, 0.06)",
+    borderColor:
+      "rgba(255, 255, 255, 0.06)",
     borderRadius: "14px",
     boxSizing: "border-box",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    boxShadow:
+      "0 4px 12px rgba(0, 0, 0, 0.15)",
   },
+
   partsGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(105px, 1fr))",
+    gridTemplateColumns:
+      "repeat(auto-fit, minmax(105px, 1fr))",
     gap: "8px",
     width: "100%",
   },
+
   partButton: {
     display: "flex",
     alignItems: "center",
@@ -796,29 +1254,36 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     padding: "7px 8px",
     borderRadius: "8px",
-    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    backgroundColor:
+      "rgba(15, 23, 42, 0.6)",
     borderWidth: "1px",
     borderStyle: "solid",
-    borderColor: "rgba(255, 255, 255, 0.08)",
+    borderColor:
+      "rgba(255, 255, 255, 0.08)",
     transition: "all 0.2s ease",
     textAlign: "center",
     boxSizing: "border-box",
     cursor: "pointer",
   },
+
   partButtonActive: {
     backgroundColor: "#0284c7",
     borderColor: "#38bdf8",
     color: "#ffffff",
-    boxShadow: "0 0 15px rgba(56, 189, 248, 0.35)",
+    boxShadow:
+      "0 0 15px rgba(56, 189, 248, 0.35)",
   },
+
   activePartContainer: {
     marginTop: "2px",
     paddingTop: "10px",
-    borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+    borderTop:
+      "1px solid rgba(255, 255, 255, 0.06)",
     display: "flex",
     flexDirection: "column",
     gap: "8px",
   },
+
   activePartLabel: {
     fontSize: "0.85rem",
     color: "#e2e8f0",
@@ -827,23 +1292,31 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: "8px",
   },
+
   customPlayer: {
     display: "flex",
-    flexWrap: "wrap",
+    flexDirection: "column",
     alignItems: "center",
-    gap: "14px",
+    justifyContent: "center",
+    gap: "10px",
     width: "100%",
-    backgroundColor: "rgba(15, 23, 42, 0.7)",
-    padding: "8px 14px",
+    backgroundColor:
+      "rgba(15, 23, 42, 0.7)",
+    padding: "10px 14px",
     borderRadius: "12px",
     boxSizing: "border-box",
-    border: "1px solid rgba(255, 255, 255, 0.04)",
+    border:
+      "1px solid rgba(255, 255, 255, 0.04)",
   },
+
   playerControls: {
     display: "flex",
     alignItems: "center",
-    gap: "10px",
+    justifyContent: "center",
+    gap: "16px",
+    height: "42px",
   },
+
   controlBtn: {
     background: "none",
     border: "none",
@@ -856,9 +1329,12 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     transition: "color 0.2s ease",
   },
+
   playBtn: {
     width: "34px",
     height: "34px",
+    minWidth: "34px",
+    minHeight: "34px",
     borderRadius: "50%",
     backgroundColor: "#0284c7",
     color: "#fff",
@@ -866,17 +1342,34 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    padding: 0,
+    lineHeight: 1,
     fontSize: "1rem",
     cursor: "pointer",
-    boxShadow: "0 0 15px rgba(2, 132, 199, 0.5)",
+    boxShadow:
+      "0 0 15px rgba(2, 132, 199, 0.5)",
     transition: "transform 0.15s ease",
   },
+
+  playIcon: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+    lineHeight: 1,
+    transform: "translateX(0)",
+  },
+
   progressContainer: {
     display: "flex",
     alignItems: "center",
+    justifyContent: "center",
     gap: "10px",
-    flex: "1 1 180px",
+    width: "100%",
+    maxWidth: "480px",
   },
+
   progressBar: {
     flex: 1,
     minWidth: "70px",
@@ -884,6 +1377,7 @@ const styles: Record<string, React.CSSProperties> = {
     accentColor: "#38bdf8",
     height: "4px",
   },
+
   timeText: {
     fontSize: "0.78rem",
     color: "#94a3b8",
@@ -891,18 +1385,22 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
     fontVariantNumeric: "tabular-nums",
   },
+
   emptyState: {
     textAlign: "center",
     padding: "40px 20px",
   },
+
   footer: {
     flexShrink: 0,
     marginTop: "8px",
     paddingTop: "4px",
     paddingBottom: "2px",
-    borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+    borderTop:
+      "1px solid rgba(255, 255, 255, 0.05)",
     textAlign: "center",
   },
+
   footerText: {
     color: "#64748b",
     fontSize: "0.8rem",
@@ -910,13 +1408,15 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 400,
     letterSpacing: "0.05em",
   },
+
   screenshotShieldModal: {
     position: "fixed",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(3, 7, 18, 0.95)",
+    backgroundColor:
+      "rgba(3, 7, 18, 0.95)",
     backdropFilter: "blur(25px)",
     WebkitBackdropFilter: "blur(25px)",
     zIndex: 99999,
@@ -925,13 +1425,17 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     padding: "20px",
   },
+
   shieldBox: {
-    backgroundColor: "rgba(15, 23, 42, 0.9)",
-    border: "1px solid rgba(56, 189, 248, 0.3)",
+    backgroundColor:
+      "rgba(15, 23, 42, 0.9)",
+    border:
+      "1px solid rgba(56, 189, 248, 0.3)",
     borderRadius: "20px",
     padding: "28px",
     textAlign: "center",
     maxWidth: "360px",
-    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8)",
+    boxShadow:
+      "0 25px 50px -12px rgba(0, 0, 0, 0.8)",
   },
 };
