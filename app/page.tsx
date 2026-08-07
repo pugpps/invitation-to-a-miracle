@@ -12,7 +12,7 @@ import {
 } from "../data/tracks";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<CategoryKey>("demo");
+  const [activeTab, setActiveTab] = useState("demo");
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
   const [isProtected, setIsProtected] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -337,7 +337,9 @@ export default function Home() {
               className="header-info-mobile"
               style={styles.headerInfo}
             >
-              <span style={styles.subtitle}>JOSEPH M. MARTIN</span>
+              <span style={styles.subtitle}>
+                JOSEPH M. MARTIN
+              </span>
 
               <h1 style={styles.title}>
                 <span className="poster-title-top">
@@ -354,10 +356,10 @@ export default function Home() {
                 style={styles.description}
               >
                 Experience the wonder, hope, and joy of the Advent
-                season. Featuring Celtic-inspired melodies and deeply
-                moving choral harmonies, this musical celebration is
-                a passionate call to reflect on the divine mystery
-                and miraculous birth of Christ.
+                season. Featuring Celtic-inspired melodies and
+                deeply moving choral harmonies, this musical
+                celebration is a passionate call to reflect on the
+                divine mystery and miraculous birth of Christ.
               </p>
             </div>
           </header>
@@ -516,40 +518,38 @@ function TrackList({
   isMobile: boolean;
 }) {
   return (
-    <div style={styles.listContainer}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px",
-        }}
-      >
-        {tracks.map((track, index) => (
-          <div
-            key={track.id}
-            className="celestial-anim"
-            style={{
-              ...styles.trackRow,
-              animationDelay: `${index * 0.05}s`,
-            }}
-          >
-            <div style={styles.trackHeader}>
-              <div style={styles.trackIcon}>🎧</div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+      }}
+    >
+      {tracks.map((track, index) => (
+        <div
+          key={track.id}
+          className="celestial-anim"
+          style={{
+            ...styles.trackRow,
+            animationDelay: `${index * 0.05}s`,
+          }}
+        >
+          <div style={styles.trackHeader}>
+            <div style={styles.trackIcon}>🎧</div>
 
-              <div style={styles.trackTitle}>
-                {track.title}
-              </div>
+            <div style={styles.trackTitle}>
+              {track.title}
             </div>
-
-            <AudioPlayer
-              url={track.url}
-              playingUrl={playingUrl}
-              setPlayingUrl={setPlayingUrl}
-              isMobile={isMobile}
-            />
           </div>
-        ))}
-      </div>
+
+          <AudioPlayer
+            url={track.url}
+            playingUrl={playingUrl}
+            setPlayingUrl={setPlayingUrl}
+            isMobile={isMobile}
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -566,25 +566,23 @@ function PartsList({
   isMobile: boolean;
 }) {
   return (
-    <div style={styles.listContainer}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px",
-        }}
-      >
-        {tracks.map((track, index) => (
-          <PartRow
-            key={track.id}
-            track={track}
-            index={index}
-            playingUrl={playingUrl}
-            setPlayingUrl={setPlayingUrl}
-            isMobile={isMobile}
-          />
-        ))}
-      </div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+      }}
+    >
+      {tracks.map((track, index) => (
+        <PartRow
+          key={track.id}
+          track={track}
+          index={index}
+          playingUrl={playingUrl}
+          setPlayingUrl={setPlayingUrl}
+          isMobile={isMobile}
+        />
+      ))}
     </div>
   );
 }
@@ -720,7 +718,7 @@ function AudioPlayer({
   setPlayingUrl: (url: string | null) => void;
   isMobile: boolean;
 }) {
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -828,7 +826,7 @@ function AudioPlayer({
   }
 
   return (
-    <div style={styles.customPlayer}>
+    <>
       <audio
         ref={audioRef}
         src={url}
@@ -858,59 +856,67 @@ function AudioPlayer({
         style={{ display: "none" }}
       />
 
-      <div style={styles.progressContainer}>
-        <span style={styles.timeText}>
-          {formatTime(currentTime)}
-        </span>
-
-        <input
-          type="range"
-          min="0"
-          max={duration || 100}
-          value={currentTime}
-          onChange={(e) => {
-            const newTime = Number(e.target.value);
-
-            setCurrentTime(newTime);
-
-            if (audioRef.current) {
-              audioRef.current.currentTime =
-                newTime;
-            }
-          }}
-          style={styles.progressBar}
-        />
-
-        <span style={styles.timeText}>
-          {formatTime(duration)}
-        </span>
-      </div>
-
-      <div style={styles.playerControls}>
-        <button
-          onClick={() => handleSkip(-5)}
-          style={styles.controlBtn}
-        >
-          ↺ 5s
-        </button>
-
-        <button
-          onClick={togglePlay}
-          style={styles.playBtn}
-        >
-          <span style={styles.playIcon}>
-            {isPlaying ? "⏸" : "▶"}
+      <div style={styles.customPlayer}>
+        <div style={styles.progressContainer}>
+          <span style={styles.timeText}>
+            {formatTime(currentTime)}
           </span>
-        </button>
 
-        <button
-          onClick={() => handleSkip(5)}
-          style={styles.controlBtn}
-        >
-          ↻ 5s
-        </button>
+          <input
+            type="range"
+            min="0"
+            max={duration || 100}
+            value={currentTime}
+            onChange={(e) => {
+              const newTime = Number(e.target.value);
+
+              setCurrentTime(newTime);
+
+              if (audioRef.current) {
+                audioRef.current.currentTime =
+                  newTime;
+              }
+            }}
+            style={styles.progressBar}
+          />
+
+          <span style={styles.timeText}>
+            {formatTime(duration)}
+          </span>
+        </div>
+
+        <div style={styles.playerControls}>
+          <button
+            onClick={() => handleSkip(-5)}
+            style={styles.controlBtn}
+          >
+            ↺ 5s
+          </button>
+
+          <button
+            onClick={togglePlay}
+            style={styles.playBtn}
+            aria-label={isPlaying ? "Pause" : "Play"}
+          >
+            {isPlaying ? (
+              <span style={styles.pauseIcon}>
+                <span style={styles.pauseIconBar} />
+                <span style={styles.pauseIconBar} />
+              </span>
+            ) : (
+              <span style={styles.playIcon} />
+            )}
+          </button>
+
+          <button
+            onClick={() => handleSkip(5)}
+            style={styles.controlBtn}
+          >
+            ↻ 5s
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -1108,7 +1114,8 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: "nowrap",
     transition:
       "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+    boxShadow:
+      "0 4px 12px rgba(0, 0, 0, 0.2)",
   },
 
   tabActive: {
@@ -1314,7 +1321,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     gap: "16px",
-    height: "42px",
+    height: "48px",
   },
 
   controlBtn: {
@@ -1331,34 +1338,54 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   playBtn: {
-    width: "34px",
-    height: "34px",
-    minWidth: "34px",
-    minHeight: "34px",
+    width: "44px",
+    height: "44px",
+    minWidth: "44px",
+    minHeight: "44px",
     borderRadius: "50%",
-    backgroundColor: "#0284c7",
-    color: "#fff",
-    border: "none",
+    backgroundColor: "transparent",
+    color: "#ffffff",
+    border: "1px solid rgba(56, 189, 248, 0.65)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     padding: 0,
-    lineHeight: 1,
-    fontSize: "1rem",
+    margin: 0,
     cursor: "pointer",
     boxShadow:
-      "0 0 15px rgba(2, 132, 199, 0.5)",
-    transition: "transform 0.15s ease",
+      "0 0 12px rgba(56, 189, 248, 0.25)",
+    transition: "all 0.15s ease",
+    WebkitAppearance: "none",
+    appearance: "none",
+    outline: "none",
+    flexShrink: 0,
   },
 
   playIcon: {
+    width: 0,
+    height: 0,
+    borderTop: "7px solid transparent",
+    borderBottom: "7px solid transparent",
+    borderLeft: "11px solid #ffffff",
+    display: "block",
+    marginLeft: "3px",
+  },
+
+  pauseIcon: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: "100%",
-    height: "100%",
-    lineHeight: 1,
-    transform: "translateX(0)",
+    gap: "4px",
+    width: "12px",
+    height: "16px",
+  },
+
+  pauseIconBar: {
+    width: "3px",
+    height: "14px",
+    backgroundColor: "#ffffff",
+    borderRadius: "1px",
+    display: "block",
   },
 
   progressContainer: {
