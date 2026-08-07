@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
+
 import {
   demoTracks,
   accompanimentTracks,
@@ -12,30 +18,71 @@ import {
 } from "../data/tracks";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<CategoryKey>("demo");
-  const [playingUrl, setPlayingUrl] = useState<string | null>(null);
-  const [isProtected, setIsProtected] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [activeTab, setActiveTab] =
+    useState<CategoryKey>("demo");
+
+  const [playingUrl, setPlayingUrl] =
+    useState<string | null>(null);
+
+  const [isProtected, setIsProtected] =
+    useState(false);
+
+  const [isMobile, setIsMobile] =
+    useState(false);
+
+  /*
+   * IMPORTANT:
+   * Keep this function stable between renders.
+   *
+   * Previously, setPlayingUrl was passed directly to every
+   * AudioPlayer. Every Home render created a new function,
+   * which could cause the AudioPlayer effects to run again.
+   */
+  const handleSetPlayingUrl = useCallback(
+    (url: string | null) => {
+      setPlayingUrl(url);
+    },
+    []
+  );
 
   /*
    * Detect mobile / touch devices.
    */
   useEffect(() => {
-    const widthMql = window.matchMedia("(max-width: 768px)");
-    const pointerMql = window.matchMedia("(pointer: coarse)");
+    const widthMql =
+      window.matchMedia("(max-width: 768px)");
+
+    const pointerMql =
+      window.matchMedia("(pointer: coarse)");
 
     const update = () => {
-      setIsMobile(widthMql.matches || pointerMql.matches);
+      setIsMobile(
+        widthMql.matches || pointerMql.matches
+      );
     };
 
     update();
 
-    widthMql.addEventListener("change", update);
-    pointerMql.addEventListener("change", update);
+    widthMql.addEventListener(
+      "change",
+      update
+    );
+
+    pointerMql.addEventListener(
+      "change",
+      update
+    );
 
     return () => {
-      widthMql.removeEventListener("change", update);
-      pointerMql.removeEventListener("change", update);
+      widthMql.removeEventListener(
+        "change",
+        update
+      );
+
+      pointerMql.removeEventListener(
+        "change",
+        update
+      );
     };
   }, []);
 
@@ -58,13 +105,18 @@ export default function Home() {
       }
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (
+      e: KeyboardEvent
+    ) => {
       if (
         e.key === "PrintScreen" ||
         (e.ctrlKey &&
           e.shiftKey &&
-          ["S", "s", "I", "i", "C", "c"].includes(e.key)) ||
-        (e.ctrlKey && ["p", "P", "s", "S"].includes(e.key))
+          ["S", "s", "I", "i", "C", "c"].includes(
+            e.key
+          )) ||
+        (e.ctrlKey &&
+          ["p", "P", "s", "S"].includes(e.key))
       ) {
         e.preventDefault();
 
@@ -76,7 +128,9 @@ export default function Home() {
       }
     };
 
-    const handleContextClick = (e: MouseEvent) => {
+    const handleContextClick = (
+      e: MouseEvent
+    ) => {
       e.preventDefault();
     };
 
@@ -85,7 +139,10 @@ export default function Home() {
       handleVisibilityChange
     );
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
 
     document.addEventListener(
       "contextmenu",
@@ -192,8 +249,13 @@ export default function Home() {
                 touch-action: manipulation;
               }
 
+              /*
+               * IMPORTANT FOR MOBILE SEEKING
+               */
               input[type="range"] {
                 touch-action: pan-x;
+                -webkit-user-select: none;
+                user-select: none;
               }
 
               .poster-title-top {
@@ -224,10 +286,6 @@ export default function Home() {
               .celestial-scroll::-webkit-scrollbar-thumb {
                 background: linear-gradient(to bottom, #38bdf8, #818cf8);
                 border-radius: 10px;
-              }
-
-              .celestial-scroll::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(to bottom, #7dd3fc, #a5b4fc);
               }
 
               @keyframes celestialFade {
@@ -284,7 +342,7 @@ export default function Home() {
                   min-height: 0 !important;
                   max-height: none !important;
                   overflow: visible !important;
-                  padding: 8px 10px 8px 10px !important;
+                  padding: 8px 10px !important;
                 }
 
                 .mobile-container-override {
@@ -364,6 +422,7 @@ export default function Home() {
 
                 .mobile-progress {
                   height: 8px !important;
+                  touch-action: pan-x !important;
                 }
 
                 .mobile-progress::-webkit-slider-thumb {
@@ -437,12 +496,13 @@ export default function Home() {
                 className="description-mobile"
                 style={styles.description}
               >
-                Experience the wonder, hope, and joy of the
-                Advent season. Featuring Celtic-inspired
-                melodies and deeply moving choral harmonies,
-                this musical celebration is a passionate call
-                to reflect on the divine mystery and miraculous
-                birth of Christ.
+                Experience the wonder, hope, and joy
+                of the Advent season. Featuring
+                Celtic-inspired melodies and deeply
+                moving choral harmonies, this musical
+                celebration is a passionate call to
+                reflect on the divine mystery and
+                miraculous birth of Christ.
               </p>
             </div>
           </header>
@@ -454,6 +514,7 @@ export default function Home() {
 
               return (
                 <button
+                  type="button"
                   key={cat.key}
                   onClick={() =>
                     setActiveTab(cat.key)
@@ -491,7 +552,9 @@ export default function Home() {
               <TrackList
                 tracks={demoTracks}
                 playingUrl={playingUrl}
-                setPlayingUrl={setPlayingUrl}
+                setPlayingUrl={
+                  handleSetPlayingUrl
+                }
                 isMobile={isMobile}
               />
             )}
@@ -500,7 +563,9 @@ export default function Home() {
               <TrackList
                 tracks={accompanimentTracks}
                 playingUrl={playingUrl}
-                setPlayingUrl={setPlayingUrl}
+                setPlayingUrl={
+                  handleSetPlayingUrl
+                }
                 isMobile={isMobile}
               />
             )}
@@ -509,7 +574,9 @@ export default function Home() {
               <PartsList
                 tracks={partsTracks}
                 playingUrl={playingUrl}
-                setPlayingUrl={setPlayingUrl}
+                setPlayingUrl={
+                  handleSetPlayingUrl
+                }
                 isMobile={isMobile}
               />
             )}
@@ -538,11 +605,13 @@ export default function Home() {
                 </div>
 
                 <div
-                  style={styles.pdfProtectionNotice}
+                  style={
+                    styles.pdfProtectionNotice
+                  }
                 >
                   <span>
-                    🔒 Embedded View: Official sheet music
-                    score loaded securely.
+                    🔒 Embedded View: Official sheet
+                    music score loaded securely.
                   </span>
                 </div>
               </div>
@@ -562,7 +631,9 @@ export default function Home() {
 
       {isProtected && (
         <div
-          style={styles.screenshotShieldModal}
+          style={
+            styles.screenshotShieldModal
+          }
         >
           <div style={styles.shieldBox}>
             <span
@@ -592,8 +663,9 @@ export default function Home() {
                 fontSize: "0.88rem",
               }}
             >
-              Screenshots and screen capturing are restricted
-              to protect copyrighted ministry materials.
+              Screenshots and screen capturing are
+              restricted to protect copyrighted
+              ministry materials.
             </p>
           </div>
         </div>
@@ -713,20 +785,25 @@ function PartRow({
   const [activePart, setActivePart] =
     useState<PartLink | null>(null);
 
-  const togglePart = (link: PartLink) => {
+  const togglePart = (
+    link: PartLink
+  ) => {
     if (activePart?.url === link.url) {
       setActivePart(null);
 
       if (playingUrl === link.url) {
         setPlayingUrl(null);
       }
-    } else {
-      setActivePart(link);
+
+      return;
     }
+
+    setActivePart(link);
   };
 
   const hasParts =
-    track.links && track.links.length > 0;
+    track.links &&
+    track.links.length > 0;
 
   return (
     <div
@@ -750,12 +827,17 @@ function PartRow({
         <>
           <div style={styles.partsGrid}>
             {track.links.map(
-              (link, linkIndex) => {
+              (
+                link,
+                linkIndex
+              ) => {
                 const isActive =
-                  activePart?.url === link.url;
+                  activePart?.url ===
+                  link.url;
 
                 return (
                   <button
+                    type="button"
                     key={linkIndex}
                     onClick={() =>
                       togglePart(link)
@@ -783,15 +865,20 @@ function PartRow({
               }}
             >
               <div
-                style={styles.activePartLabel}
+                style={
+                  styles.activePartLabel
+                }
               >
                 <span
-                  style={{ color: "#38bdf8" }}
+                  style={{
+                    color: "#38bdf8",
+                  }}
                 >
                   ▶
                 </span>
 
-                Playing: {activePart.label}
+                Playing:{" "}
+                {activePart.label}
               </div>
 
               <AudioPlayer
@@ -799,7 +886,9 @@ function PartRow({
                 url={activePart.url}
                 autoPlay={true}
                 playingUrl={playingUrl}
-                setPlayingUrl={setPlayingUrl}
+                setPlayingUrl={
+                  setPlayingUrl
+                }
                 isMobile={isMobile}
               />
             </div>
@@ -821,8 +910,9 @@ function PartRow({
               textAlign: "center",
             }}
           >
-            ⚠️ The audio file is not yet available. It
-            will be updated once released.
+            ⚠️ The audio file is not yet
+            available. It will be updated
+            once released.
           </span>
         </div>
       )}
@@ -848,7 +938,12 @@ function AudioPlayer({
   isMobile: boolean;
 }) {
   const audioRef =
-    useRef<HTMLAudioElement | null>(null);
+    useRef<HTMLAudioElement | null>(
+      null
+    );
+
+  const seekRafRef =
+    useRef<number | null>(null);
 
   const [isPlaying, setIsPlaying] =
     useState(false);
@@ -863,73 +958,36 @@ function AudioPlayer({
     useState(false);
 
   /*
-   * Keep the latest playingUrl accessible to
-   * event handlers without stale closures.
+   * Keep latest global player value
+   * accessible without causing effects
+   * to constantly re-run.
    */
   const playingUrlRef =
-    useRef<string | null>(playingUrl);
+    useRef<string | null>(
+      playingUrl
+    );
 
   useEffect(() => {
-    playingUrlRef.current = playingUrl;
+    playingUrlRef.current =
+      playingUrl;
   }, [playingUrl]);
 
   /*
-   * Main synchronization system.
+   * =====================================================
+   * SOURCE INITIALIZATION
    *
-   * If another player becomes active:
-   * pause this player.
+   * This effect ONLY runs when the URL changes.
    *
-   * If this player's URL becomes active:
-   * start/resume it.
+   * VERY IMPORTANT:
+   * Do not put playingUrl or setPlayingUrl here.
+   *
+   * The old code could cause audio.load() to happen
+   * during unrelated React renders.
+   * =====================================================
    */
   useEffect(() => {
-    const audio = audioRef.current;
-
-    if (!audio || hasError) {
-      return;
-    }
-
-    if (playingUrl !== url) {
-      if (!audio.paused) {
-        audio.pause();
-      }
-
-      setIsPlaying(false);
-
-      return;
-    }
-
-    /*
-     * This URL is the globally selected player.
-     * Start it only when it is currently paused.
-     */
-    if (audio.paused) {
-      audio
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch(() => {
-          /*
-           * Browsers can reject playback because of
-           * autoplay restrictions.
-           */
-          setIsPlaying(false);
-        });
-    }
-  }, [playingUrl, url, hasError]);
-
-  /*
-   * Initialize / reload when the URL changes.
-   *
-   * Important:
-   * We DO NOT reset the audio every time
-   * playingUrl changes. This is what allows
-   * pause -> resume to continue from the
-   * same position.
-   */
-  useEffect(() => {
-    const audio = audioRef.current;
+    const audio =
+      audioRef.current;
 
     if (!audio) {
       return;
@@ -941,67 +999,110 @@ function AudioPlayer({
     setIsPlaying(false);
 
     audio.pause();
-    audio.currentTime = 0;
 
     /*
-     * Force browser to load the new source.
+     * Only load when the actual source changes.
      */
     audio.load();
 
-    /*
-     * For choral part buttons that request
-     * autoPlay, register this URL as the
-     * globally playing URL.
-     */
     if (autoPlay) {
       setPlayingUrl(url);
     }
 
     return () => {
       audio.pause();
-    };
-  }, [url, autoPlay, setPlayingUrl]);
 
-  /*
-   * Clean up player when component unmounts.
-   */
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
+      if (
+        seekRafRef.current !== null
+      ) {
+        cancelAnimationFrame(
+          seekRafRef.current
+        );
       }
     };
-  }, []);
+  }, [
+    url,
+    autoPlay,
+    setPlayingUrl,
+  ]);
 
   /*
-   * Format seconds into M:SS.
+   * =====================================================
+   * GLOBAL PLAYBACK SYNCHRONIZATION
+   *
+   * This effect does NOT load the audio.
+   *
+   * It only pauses/plays the existing audio element.
+   * =====================================================
    */
-  const formatTime = (time: number) => {
+  useEffect(() => {
+    const audio =
+      audioRef.current;
+
+    if (!audio || hasError) {
+      return;
+    }
+
+    if (playingUrl !== url) {
+      if (!audio.paused) {
+        audio.pause();
+      }
+
+      return;
+    }
+
+    /*
+     * The selected player should play.
+     *
+     * Do not call load().
+     */
+    if (audio.paused) {
+      audio
+        .play()
+        .catch(() => {
+          /*
+           * Autoplay can be rejected by
+           * mobile browsers.
+           */
+        });
+    }
+  }, [
+    playingUrl,
+    url,
+    hasError,
+  ]);
+
+  /*
+   * =====================================================
+   * FORMAT TIME
+   * =====================================================
+   */
+  const formatTime = (
+    time: number
+  ) => {
     if (!Number.isFinite(time)) {
       return "0:00";
     }
 
-    const m = Math.floor(time / 60);
-    const s = Math.floor(time % 60);
+    const m = Math.floor(
+      time / 60
+    );
+
+    const s = Math.floor(
+      time % 60
+    );
 
     return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
   /*
-   * Play / Pause.
-   *
-   * When playing:
-   * - set global playing URL
-   * - this automatically pauses every other player
-   *
-   * When paused:
-   * - set global URL to null
-   * - currentTime is NOT reset
-   * - pressing play again resumes from the
-   *   exact previous position.
+   * =====================================================
+   * PLAY / PAUSE
+   * =====================================================
    */
   const togglePlay = async () => {
-    const audio = audioRef.current;
+    const audio =
+      audioRef.current;
 
     if (!audio || hasError) {
       return;
@@ -1012,7 +1113,10 @@ function AudioPlayer({
 
       setIsPlaying(false);
 
-      if (playingUrlRef.current === url) {
+      if (
+        playingUrlRef.current ===
+        url
+      ) {
         setPlayingUrl(null);
       }
 
@@ -1020,9 +1124,7 @@ function AudioPlayer({
     }
 
     /*
-     * Set global active player first.
-     * This makes all other AudioPlayer components
-     * stop automatically.
+     * Select this player globally.
      */
     setPlayingUrl(url);
 
@@ -1032,54 +1134,106 @@ function AudioPlayer({
       setIsPlaying(true);
     } catch {
       setIsPlaying(false);
-      setHasError(true);
-
-      if (playingUrlRef.current === url) {
-        setPlayingUrl(null);
-      }
     }
   };
 
   /*
-   * Skip forward/backward.
+   * =====================================================
+   * SKIP
+   * =====================================================
    */
-  const handleSkip = (seconds: number) => {
-    const audio = audioRef.current;
+  const handleSkip = (
+    seconds: number
+  ) => {
+    const audio =
+      audioRef.current;
 
     if (!audio || hasError) {
       return;
     }
+
+    const durationValue =
+      Number.isFinite(
+        audio.duration
+      )
+        ? audio.duration
+        : 0;
 
     const newTime = Math.max(
       0,
       Math.min(
-        audio.duration || Infinity,
-        audio.currentTime + seconds
+        durationValue,
+        audio.currentTime +
+          seconds
       )
     );
 
-    audio.currentTime = newTime;
+    audio.currentTime =
+      newTime;
 
-    setCurrentTime(newTime);
+    setCurrentTime(
+      newTime
+    );
   };
 
   /*
-   * Seek to specific position.
+   * =====================================================
+   * MOBILE-SMOOTH SEEKING
+   *
+   * Instead of forcing React to render for every single
+   * slider event, update the audio immediately and
+   * visually update React at most once per animation frame.
+   * =====================================================
    */
   const handleSeek = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const audio = audioRef.current;
+    const audio =
+      audioRef.current;
 
     if (!audio || hasError) {
       return;
     }
 
-    const newTime = Number(e.target.value);
+    const newTime =
+      Number(e.target.value);
 
-    audio.currentTime = newTime;
+    if (
+      !Number.isFinite(newTime)
+    ) {
+      return;
+    }
 
-    setCurrentTime(newTime);
+    /*
+     * Change the REAL audio position immediately.
+     */
+    audio.currentTime =
+      newTime;
+
+    /*
+     * Cancel previous visual update.
+     */
+    if (
+      seekRafRef.current !== null
+    ) {
+      cancelAnimationFrame(
+        seekRafRef.current
+      );
+    }
+
+    /*
+     * Update React state only once
+     * per browser animation frame.
+     */
+    seekRafRef.current =
+      requestAnimationFrame(() => {
+        setCurrentTime(
+          newTime
+        );
+
+        seekRafRef.current =
+          null;
+      });
   };
 
   if (hasError) {
@@ -1087,19 +1241,20 @@ function AudioPlayer({
       <div
         style={{
           ...styles.customPlayer,
-          justifyContent: "center",
+          justifyContent:
+            "center",
         }}
       >
         <span
           style={{
             color: "#f87171",
             fontSize: "0.85rem",
-            fontWeight: 500,
             textAlign: "center",
           }}
         >
-          ⚠️ The audio file is not yet available. It
-          will be updated once released.
+          ⚠️ The audio file is not
+          yet available. It will be
+          updated once released.
         </span>
       </div>
     );
@@ -1113,7 +1268,8 @@ function AudioPlayer({
         preload="metadata"
         controlsList="nodownload"
         {...({
-          disablePictureInPicture: true,
+          disablePictureInPicture:
+            true,
         } as any)}
         onContextMenu={(e) =>
           e.preventDefault()
@@ -1122,37 +1278,52 @@ function AudioPlayer({
           setHasError(true);
           setIsPlaying(false);
 
-          if (playingUrlRef.current === url) {
+          if (
+            playingUrlRef.current ===
+            url
+          ) {
             setPlayingUrl(null);
           }
         }}
         onLoadedMetadata={() => {
-          const audio = audioRef.current;
-
-          if (!audio) {
-            return;
-          }
-
-          if (
-            Number.isFinite(audio.duration)
-          ) {
-            setDuration(audio.duration);
-          }
-        }}
-        onDurationChange={() => {
-          const audio = audioRef.current;
+          const audio =
+            audioRef.current;
 
           if (
             audio &&
-            Number.isFinite(audio.duration)
+            Number.isFinite(
+              audio.duration
+            )
           ) {
-            setDuration(audio.duration);
+            setDuration(
+              audio.duration
+            );
+          }
+        }}
+        onDurationChange={() => {
+          const audio =
+            audioRef.current;
+
+          if (
+            audio &&
+            Number.isFinite(
+              audio.duration
+            )
+          ) {
+            setDuration(
+              audio.duration
+            );
           }
         }}
         onTimeUpdate={() => {
-          const audio = audioRef.current;
+          const audio =
+            audioRef.current;
 
           if (audio) {
+            /*
+             * Don't update state while user is
+             * actively dragging the slider.
+             */
             setCurrentTime(
               audio.currentTime
             );
@@ -1161,12 +1332,9 @@ function AudioPlayer({
         onPlay={() => {
           setIsPlaying(true);
 
-          /*
-           * Synchronize global state if playback
-           * starts from a browser interaction.
-           */
           if (
-            playingUrlRef.current !== url
+            playingUrlRef.current !==
+            url
           ) {
             setPlayingUrl(url);
           }
@@ -1179,20 +1347,20 @@ function AudioPlayer({
           setCurrentTime(0);
 
           if (
-            playingUrlRef.current === url
+            playingUrlRef.current ===
+            url
           ) {
             setPlayingUrl(null);
           }
 
-          /*
-           * Return to the beginning when finished,
-           * allowing the user to replay normally.
-           */
           if (audioRef.current) {
-            audioRef.current.currentTime = 0;
+            audioRef.current.currentTime =
+              0;
           }
         }}
-        style={{ display: "none" }}
+        style={{
+          display: "none",
+        }}
       />
 
       <div style={styles.customPlayer}>
@@ -1201,21 +1369,38 @@ function AudioPlayer({
         ================================================== */}
 
         <div
-          style={styles.progressContainer}
+          style={
+            styles.progressContainer
+          }
         >
-          <span style={styles.timeText}>
-            {formatTime(currentTime)}
+          <span
+            style={styles.timeText}
+          >
+            {formatTime(
+              currentTime
+            )}
           </span>
 
           <input
             type="range"
             min="0"
-            max={duration || 100}
+            max={
+              duration > 0
+                ? duration
+                : 100
+            }
             step="0.01"
             value={Math.min(
               currentTime,
-              duration || 100
+              duration > 0
+                ? duration
+                : 100
             )}
+            /*
+             * onChange works well on most browsers,
+             * while the actual audio position is changed
+             * immediately inside handleSeek.
+             */
             onChange={handleSeek}
             className={
               isMobile
@@ -1231,8 +1416,12 @@ function AudioPlayer({
             aria-label="Audio progress"
           />
 
-          <span style={styles.timeText}>
-            {formatTime(duration)}
+          <span
+            style={styles.timeText}
+          >
+            {formatTime(
+              duration
+            )}
           </span>
         </div>
 
@@ -1254,7 +1443,9 @@ function AudioPlayer({
           }}
         >
           {/* BACK 5 SECONDS */}
+
           <button
+            type="button"
             onClick={() =>
               handleSkip(-5)
             }
@@ -1275,7 +1466,9 @@ function AudioPlayer({
           </button>
 
           {/* PLAY / PAUSE */}
+
           <button
+            type="button"
             onClick={togglePlay}
             className={
               isMobile
@@ -1295,7 +1488,11 @@ function AudioPlayer({
             }
           >
             {isPlaying ? (
-              <span style={styles.pauseIcon}>
+              <span
+                style={
+                  styles.pauseIcon
+                }
+              >
                 <span
                   style={
                     styles.pauseIconBar
@@ -1310,13 +1507,17 @@ function AudioPlayer({
               </span>
             ) : (
               <span
-                style={styles.playIcon}
+                style={
+                  styles.playIcon
+                }
               />
             )}
           </button>
 
           {/* FORWARD 5 SECONDS */}
+
           <button
+            type="button"
             onClick={() =>
               handleSkip(5)
             }
@@ -1428,7 +1629,8 @@ const styles: Record<
     backgroundColor:
       "rgba(15, 23, 42, 0.75)",
     backdropFilter: "blur(20px)",
-    WebkitBackdropFilter: "blur(20px)",
+    WebkitBackdropFilter:
+      "blur(20px)",
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor:
@@ -1571,7 +1773,8 @@ const styles: Record<
     backgroundColor:
       "rgba(15, 23, 42, 0.45)",
     backdropFilter: "blur(16px)",
-    WebkitBackdropFilter: "blur(16px)",
+    WebkitBackdropFilter:
+      "blur(16px)",
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor:
@@ -1608,13 +1811,6 @@ const styles: Record<
     color: "#94a3b8",
     fontSize: "0.8rem",
     letterSpacing: "0.03em",
-  },
-
-  listContainer: {
-    display: "flex",
-    flexDirection: "column",
-    paddingTop: "4px",
-    paddingBottom: "4px",
   },
 
   trackRow: {
@@ -1771,10 +1967,12 @@ const styles: Record<
     cursor: "pointer",
     accentColor: "#38bdf8",
     height: "4px",
+    touchAction: "pan-x",
   },
 
   mobileProgressBar: {
     height: "8px",
+    touchAction: "pan-x",
   },
 
   timeText: {
@@ -1825,7 +2023,8 @@ const styles: Record<
     minWidth: "44px",
     minHeight: "44px",
     borderRadius: "50%",
-    backgroundColor: "transparent",
+    backgroundColor:
+      "transparent",
     color: "#ffffff",
     border:
       "1px solid rgba(56, 189, 248, 0.65)",
@@ -1839,7 +2038,8 @@ const styles: Record<
       "0 0 12px rgba(56, 189, 248, 0.25)",
     transition:
       "all 0.15s ease",
-    WebkitAppearance: "none",
+    WebkitAppearance:
+      "none",
     appearance: "none",
     outline: "none",
     flexShrink: 0,
@@ -1880,11 +2080,6 @@ const styles: Record<
     backgroundColor: "#ffffff",
     borderRadius: "1px",
     display: "block",
-  },
-
-  emptyState: {
-    textAlign: "center",
-    padding: "40px 20px",
   },
 
   footer: {
